@@ -180,6 +180,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.AthenaForm = {
         config: FORM_CONFIG,
+
+        // Runtime switches owned by the Webflow page, e.g.
+        //   window.AthenaForm.webflowGlobals.call = true
+        // Carried over so a Webflow snippet that runs before this assignment
+        // is not clobbered by it.
+        webflowGlobals: window.AthenaForm?.webflowGlobals || {},
+
         state,
         dom,
         animations,

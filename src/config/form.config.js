@@ -293,7 +293,11 @@ export const FORM_CONFIG = {
         field: "hbform_q17_timeline",
         value: "asap_this_is_a_priority",
         flag: "call-flow",
-        action: "enable"
+        action: "enable",
+
+        // Rule is inert unless Webflow sets
+        // window.AthenaForm.webflowGlobals.call = true
+        requiresWebflowGlobal: "call"
       }
     ],
 
@@ -347,7 +351,15 @@ export const FORM_CONFIG = {
   },
 
   callStep: {
-    redirectUrl: "https://athenago.zoom.us/j/89937607407"
+    redirectUrl: "https://athenago.zoom.us/j/89937607407",
+
+    // Master switch for the whole call flow. Set from Webflow at runtime:
+    //   window.AthenaForm.webflowGlobals.call = true
+    // When it is absent or falsy, every lead goes through the normal
+    // ChiliPiper booking flow. Set requireWebflowGlobal to false to run the
+    // call flow off the visibility flag alone (pre-gate behavior).
+    requireWebflowGlobal: true,
+    webflowGlobalKey: "call"
   },
 
 };

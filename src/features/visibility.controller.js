@@ -34,6 +34,19 @@ export function createVisibilityController({
             .filter(Boolean);
     }
 
+    // Set by the Webflow page, never by this bundle:
+    //   window.AthenaForm.webflowGlobals.call = true
+    // Read lazily so Webflow can set it before or after init, and so it can be
+    // toggled at runtime without a redeploy.
+    function isWebflowGlobalEnabled(key) {
+        if (!key) return false;
+
+        const value = window.AthenaForm?.webflowGlobals?.[key];
+
+        // Accept "true" too — Webflow embeds often stringify values.
+        return value === true || value === "true";
+    }
+
     function getGlobalFlags() {
         const globalName = visibilityConfig.globalName || "__ATHENA_FLAGS__";
         const rawFlags = window[globalName];
@@ -155,6 +168,19 @@ export function createVisibilityController({
         rules.forEach((rule) => {
             if (String(rule.step) !== String(stepName)) return;
             if (!rule.flag) return;
+
+            // Runtime kill switch set by Webflow. Read live on every pass so it
+            // can be flipped without a redeploy.
+            if (
+                rule.requiresWebflowGlobal &&
+                !isWebflowGlobalEnabled(rule.requiresWebflowGlobal)
+            ) {
+                disable(rule.flag, {
+                    apply: false,
+                });
+
+                return;
+            }
 
             const selectedValue = getSelectedValueForRule(stepName, rule);
             const isMatch = ruleMatchesValue(rule, selectedValue);

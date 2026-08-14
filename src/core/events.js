@@ -30,8 +30,28 @@ export function bindEvents({
         }
     }
 
+    // Set by the Webflow page, never by this bundle:
+    //   window.AthenaForm.webflowGlobals.call = true
+    // Read lazily on every click so it can be toggled without a redeploy.
+    function isCallFlowEnabled() {
+        const callStepConfig = config.callStep || {};
+
+        if (callStepConfig.requireWebflowGlobal === false) return true;
+
+        const value =
+            window.AthenaForm?.webflowGlobals?.[
+                callStepConfig.webflowGlobalKey || "call"
+            ];
+
+        // Accept "true" too — Webflow embeds often stringify values.
+        return value === true || value === "true";
+    }
+
     function routeToCallStepIfNeeded(currentStep) {
         if (currentStep !== "info") return false;
+
+        // Master switch: without it every lead stays on the ChiliPiper flow.
+        if (!isCallFlowEnabled()) return false;
 
         if (!visibility?.hasFlag?.("call-flow")) return false;
 
