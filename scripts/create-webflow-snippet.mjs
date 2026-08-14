@@ -10,7 +10,7 @@ if (!entry) {
   throw new Error("Could not find src/app.js in Vite manifest.");
 }
 
-const baseUrl = "https://cdn.jsdelivr.net/gh/ClickyMcTypey/athena-form@main/dist";
+const baseUrl = "https://cdn.jsdelivr.net/gh/rey-bernardino/athena-form@callflowmerge/dist";
 const snippet = `<script type="module" src="${baseUrl}/${entry.file}"></script>\n`;
 
 fs.writeFileSync("dist/webflow-snippet.html", snippet);
