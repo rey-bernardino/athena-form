@@ -322,8 +322,8 @@ export const FORM_CONFIG = {
     outputVersionField: "leadformversion",
 
     formVersion: "1.1.0",
-    formEffectivityDate: "2026-08-14",
-    formVersionContext: "Added Step 18",
+    formEffectivityDate: "2026-08-15",
+    formVersionContext: "Added Step 18, Call Flow Merged, Progressbar Update",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
