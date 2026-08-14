@@ -64,13 +64,16 @@ export const FORM_CONFIG = {
     "success",
   ],
 
+  // Steps that pin the progress bar to 100%. The quiz is over by the time the
+  // email step is reached, so everything from there on stays full.
   progressCompleteSteps: [
     "email",
     "info",
     "call",
     "call-t3",
     "calendar",
-    "loading_chili"
+    "loading_chili",
+    "success"
   ],
 
   bannedCountries: [
