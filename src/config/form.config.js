@@ -321,9 +321,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "1.1.0",
-    formEffectivityDate: "2026-08-15",
-    formVersionContext: "Added Step 18, Call Flow Merged, Progressbar Update",
+    formVersion: "1.1.1",
+    formEffectivityDate: "2026-08-19",
+    formVersionContext: "Fixed Phantom Button on mobile",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
