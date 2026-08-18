@@ -267,11 +267,14 @@ export function bindEvents({
         // Intro / interstitial steps have nothing to validate — leave them alone.
         if (!hasValidatableFields) return true;
 
+        // validateStep paints the invalid field styling as it runs, which is the
+        // feedback we want here. Deliberately NOT updateStepValidationUI: that
+        // also collapses the proceed mask, and radio steps auto-advance from
+        // their change handler without ever re-showing it — so a blocked tap
+        // would permanently kill a continue button that was legitimately open.
         if (validation.validateStep(stepName)) return true;
 
-        // Blocked: repaint the invalid styling and re-hide the mask so the tap
-        // produces visible feedback instead of doing nothing.
-        validation.updateStepValidationUI(stepName);
+        $step.removeAttr("validated");
 
         return false;
     }
