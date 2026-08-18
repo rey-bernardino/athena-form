@@ -247,6 +247,35 @@ export function bindEvents({
         return validation.updateStepValidationUI(stepName);
     }
 
+    // The proceed mask is hidden by animating height/opacity to 0, not by being
+    // removed from the layout — and on mobile it is fixed to the bottom of the
+    // viewport. That leaves an invisible but tappable button, so the click
+    // itself is never proof that the step is passable. Re-check on every click.
+    function canProceedFromStep(stepName) {
+        if (!stepName) return false;
+
+        const $step = getStepElement(stepName);
+
+        if (!$step.length) return true;
+
+        const hasValidatableFields = $step
+            .find("input[name], select[name], textarea[name]")
+            .not("[ignore]")
+            .not("[honey]")
+            .length > 0;
+
+        // Intro / interstitial steps have nothing to validate — leave them alone.
+        if (!hasValidatableFields) return true;
+
+        if (validation.validateStep(stepName)) return true;
+
+        // Blocked: repaint the invalid styling and re-hide the mask so the tap
+        // produces visible feedback instead of doing nothing.
+        validation.updateStepValidationUI(stepName);
+
+        return false;
+    }
+
     // prevent duplicate binding
     $(document).off(".athenaForm");
 
