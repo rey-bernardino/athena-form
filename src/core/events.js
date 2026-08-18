@@ -400,12 +400,23 @@ export function bindEvents({
     $(document).on("click.athenaForm", "[cmd='proceed']", function (e) {
         const $button = $(this);
         const isLast = $button.is("[last]");
+        const currentStep = steps.getCurrentStep();
+
+        // Capture the double-click lock before validating: validateStep clears
+        // state.nextLocked as it finishes, which would otherwise let a second
+        // rapid tap through.
+        const wasNextLocked = state.nextLocked;
+
+        if (!canProceedFromStep(currentStep)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            return;
+        }
 
         if (isLast) {
             e.preventDefault();
             e.stopImmediatePropagation();
-
-            const currentStep = steps.getCurrentStep();
 
             if (routeToCallStepIfNeeded(currentStep)) {
                 return;
@@ -425,11 +436,9 @@ export function bindEvents({
             return;
         }
 
-        if (!state.nextLocked) {
+        if (!wasNextLocked) {
             maybeShowBackButton();
             fireStepAttribution();
-
-            const currentStep = steps.getCurrentStep();
 
             branching?.applyFromStep(currentStep);
 
