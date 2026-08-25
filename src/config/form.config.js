@@ -87,6 +87,11 @@ export const FORM_CONFIG = {
     "gt",
   ],
 
+  steps: {
+    // First step faded in on page load. Also add it to noBackButtonSteps.
+    initialStep: "email",
+  },
+
   noBackButtonSteps: [
     "1",
     "loading",
@@ -321,9 +326,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "1.1.1",
+    formVersion: "All In Bare Form",
     formEffectivityDate: "2026-08-19",
-    formVersionContext: "Fixed Phantom Button on mobile",
+    formVersionContext: "Initial",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
