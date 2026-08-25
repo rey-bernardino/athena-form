@@ -30,11 +30,34 @@ export const FORM_CONFIG = {
   ],
 
   progressSteps: [
+    "8",
     "9",
+    "9-founders-pricing",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "16-founders-hiring",
+    "17",
+    "18",
+    "18-branch-2",
     "loading",
     "email",
     "info",
     "calendar",
+    "success",
+  ],
+
+  // Steps that pin the progress bar to 100%. The quiz is over by the time the
+  // email step is reached, so everything from there on stays full.
+  progressCompleteSteps: [
+    "email",
+    "info",
+    "calendar",
+    "loading_chili",
     "success",
   ],
 

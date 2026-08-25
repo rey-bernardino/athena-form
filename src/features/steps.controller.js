@@ -331,21 +331,59 @@ export function createStepsController({
     return [previousStepIndex, nextStepIndex];
   }
 
+  function getProgressCompleteSteps() {
+    return (config.progressCompleteSteps || []).map(String);
+  }
+
+  // Steps that must not count toward the quiz total: the non-quiz interstitials
+  // plus every step that is already "complete" (email onward).
+  function buildProgressExclusionSelector() {
+    const excluded = new Set([
+      "error",
+      "loading",
+      "loading_chili",
+      "closed",
+      ...getProgressCompleteSteps(),
+    ]);
+
+    return [...excluded]
+      .map((step) => `[step="${step}"]`)
+      .concat("[skip]")
+      .join(", ");
+  }
+
   function updateProgressBar() {
-    const $steps = $("[step]").not(
-      "[step=error], [step=loading], [step=loading_chili], [step=closed], [skip]"
-    );
+    const $bar = dom.getProgressBar();
+
+    if (!$bar.length) return;
+
+    const currentStep = getCurrentStep();
+
+    // Mid-transition there is no visible step. Leave the bar alone rather than
+    // snapping it to 0.
+    if (!currentStep) return;
+
+    // email onward the quiz is finished — hold the bar at 100%.
+    if (getProgressCompleteSteps().includes(String(currentStep))) {
+      $bar.css("width", "100%");
+      return;
+    }
+
+    const $steps = $("[step]").not(buildProgressExclusionSelector());
 
     const length = $steps.length;
     if (!length) return;
 
-    const currentStep = getCurrentStep();
     const currentElement = $(`[step="${currentStep}"]`)[0];
+    const rawIndex = $steps.index(currentElement);
 
-    const currentIndex = $steps.index(currentElement) + 1;
-    const percentage = (currentIndex / length) * 100;
+    // Current step is not part of the counted set (error, closed, a [skip]ped
+    // branch). Hold the previous width instead of resetting to 0.
+    if (rawIndex < 0) return;
 
-    $(".progressbar-progress").css("width", `${percentage}%`);
+    const percentage = ((rawIndex + 1) / length) * 100;
+
+    $bar.css("width", `${percentage}%`);
   }
 
   function shouldShowProgressBar(targetStepName) {
