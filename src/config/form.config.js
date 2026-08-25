@@ -29,6 +29,19 @@ export const FORM_CONFIG = {
     "closed",
   ],
 
+  conditionalFields: [
+    {
+      field: "hbform_q18_extrahelp",
+      value: "other",
+      targetSelector: '[conditional="hbform_q18_extrahelp"]',
+      secondaryField: "hbform_q18_extrahelp_secondary"
+    }
+  ],
+
+  optionalBlankFields: [
+    "hbform_q18_extrahelp_secondary"
+  ],
+
   progressSteps: [
     "8",
     "v3-6",

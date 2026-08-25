@@ -5,6 +5,16 @@ export function createValidationService({
   config,
   animations,
 }) {
+
+  function isOptionalBlankField(name, value) {
+    const optionalBlankFields = config.optionalBlankFields || [];
+
+    return (
+      optionalBlankFields.includes(String(name)) &&
+      String(value || "").trim() === ""
+    );
+  }
+
   function validateEmail(email) {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(String(email).toLowerCase());
@@ -13,7 +23,7 @@ export function createValidationService({
   function getUniqueFieldNames($step) {
     const names = [];
 
-    $step.find("input[name], select[name]").not("[ignore]").each(function () {
+    $step.find("input[name], select[name], textarea[name]").not("[ignore]").each(function () {
       const name = $(this).attr("name");
 
       if (name && !names.includes(name)) {
@@ -275,7 +285,9 @@ export function createValidationService({
   }
 
   function validateTextField($step, name) {
-    const $text = findFieldByName($step, name).filter('[type="text"]');
+    const $text = findFieldByName($step, name).filter(
+      'input[type="text"], textarea'
+    );
 
     if (!$text.length) return null;
 
@@ -283,13 +295,19 @@ export function createValidationService({
 
     $text.each(function () {
       const $field = $(this);
+      const value = String($field.val() || "").trim();
+
+      // Allow configured optional fields to be blank
+      // even if they are hidden or untouched.
+      if (isOptionalBlankField(name, value)) {
+        markValid($field);
+        return;
+      }
 
       if (!shouldValidateField($field)) {
         isValid = false;
         return;
       }
-
-      const value = String($field.val() || "").trim();
 
       if (!value) {
         markInvalid($field);

@@ -2,6 +2,7 @@
 
 export function bindEvents({
     state,
+    config,
     steps,
     validation,
     animations,
@@ -9,6 +10,67 @@ export function bindEvents({
     visibility,
     attribution,
 }) {
+    function getFieldValues(fieldName) {
+        const $checkedBoxes = $(`input[type="checkbox"][for="${fieldName}"]:checked`);
+
+        if ($checkedBoxes.length) {
+            return $checkedBoxes
+                .map(function () {
+                    return String($(this).val() || "").trim();
+                })
+                .get()
+                .filter(Boolean);
+        }
+
+        const rawValue = $(`[name="${fieldName}"]`).first().val();
+
+        return String(rawValue || "")
+            .split(";")
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    function syncConditionalFieldRule(rule) {
+        if (!rule?.field || !rule?.value) return;
+
+        const values = getFieldValues(rule.field);
+        const shouldShow = values.includes(String(rule.value));
+
+        const $target = $(rule.targetSelector || `[conditional="${rule.field}"]`);
+        const $secondary = rule.secondaryField
+            ? $(`[name="${rule.secondaryField}"]`)
+            : $();
+
+        if (shouldShow) {
+            $target.attr("data-conditional-active", "true");
+            $target.removeAttr("hidden");
+            $target.show();
+            return;
+        }
+
+        $target.removeAttr("data-conditional-active");
+        $target.attr("hidden", "");
+        $target.hide();
+
+        if ($secondary.length) {
+            $secondary.val("");
+            $secondary.attr("value", "");
+            $secondary.attr("solo", "");
+            $secondary.removeClass("invalid is-invalid error");
+        }
+    }
+
+    function syncConditionalFields(changedFieldName = null) {
+        const rules = config.conditionalFields || [];
+
+        rules.forEach((rule) => {
+            if (changedFieldName && rule.field !== changedFieldName) return;
+
+            syncConditionalFieldRule(rule);
+        });
+    }
+
+
     function getStepNameFromElement(element) {
         return $(element).closest("[step]").attr("step");
     }
@@ -148,6 +210,10 @@ export function bindEvents({
         $(this).removeAttr("solo");
 
         syncCheckboxGroup(this);
+
+        const identifier = $(this).attr("for");
+        syncConditionalFields(identifier);
+
         updateValidationForElement(this);
     });
 
@@ -281,6 +347,8 @@ export function bindEvents({
 
         state.backLocked = true;
     });
+
+    syncConditionalFields();
 }
 
 export function startSystemLoops() {
