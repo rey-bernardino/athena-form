@@ -166,6 +166,38 @@ export function bindEvents({
         return validation.updateStepValidationUI(stepName);
     }
 
+    // The proceed mask is hidden by animating height/opacity to 0, not by being
+    // removed from the layout — and on mobile it is fixed to the bottom of the
+    // viewport. That leaves an invisible but tappable button, so the click
+    // itself is never proof that the step is passable. Re-check on every click.
+    function canProceedFromStep(stepName) {
+        if (!stepName) return false;
+
+        const $step = getStepElement(stepName);
+
+        if (!$step.length) return true;
+
+        const hasValidatableFields = $step
+            .find("input[name], select[name], textarea[name]")
+            .not("[ignore]")
+            .not("[honey]")
+            .length > 0;
+
+        // Intro / interstitial steps have nothing to validate — leave them alone.
+        if (!hasValidatableFields) return true;
+
+        // validateStep paints the invalid field styling as it runs, which is the
+        // feedback we want here. Deliberately NOT updateStepValidationUI: that
+        // also collapses the proceed mask, and radio steps auto-advance from
+        // their change handler without ever re-showing it — so a blocked tap
+        // would permanently kill a continue button that was legitimately open.
+        if (validation.validateStep(stepName)) return true;
+
+        $step.removeAttr("validated");
+
+        return false;
+    }
+
     // prevent duplicate binding
     $(document).off(".athenaForm");
 
@@ -277,6 +309,19 @@ export function bindEvents({
     $(document).on("click.athenaForm", "[cmd='proceed']", function (e) {
         const $button = $(this);
         const isLast = $button.is("[last]");
+        const currentStep = steps.getCurrentStep();
+
+        // Capture the double-click lock before validating: validateStep clears
+        // state.nextLocked as it finishes, which would otherwise let a second
+        // rapid tap through.
+        const wasNextLocked = state.nextLocked;
+
+        if (!canProceedFromStep(currentStep)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            return;
+        }
 
         if (isLast) {
             e.preventDefault();
@@ -296,11 +341,9 @@ export function bindEvents({
             return;
         }
 
-        if (!state.nextLocked) {
+        if (!wasNextLocked) {
             maybeShowBackButton();
             fireStepAttribution();
-
-            const currentStep = steps.getCurrentStep();
 
             branching?.applyFromStep(currentStep);
 

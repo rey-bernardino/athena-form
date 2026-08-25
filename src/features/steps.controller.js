@@ -390,6 +390,23 @@ export function createStepsController({
     return config.progressSteps.includes(targetStepName);
   }
 
+  // Hiding the continue mask is sticky: it collapses the mask and disables its
+  // pointer events, and nothing re-shows it on its own. Radio steps auto-advance
+  // from their change handler without ever calling "show", so a step that was
+  // hidden while invalid would stay dead on back-navigation. Re-arm it on entry
+  // for steps that already passed validation.
+  //
+  // Only ever re-shows — never hides. Steps with no fields keep whatever state
+  // the Webflow markup gives them.
+  function restoreContinueButton(stepName) {
+    const $step = $(`[step="${stepName}"]`);
+
+    if (!$step.length) return;
+    if (!$step.attr("validated")) return;
+
+    animations.toggleContinueButton("show", stepName);
+  }
+
   function stepInit() {
     state.backLocked = false;
     state.nextLocked = false;
@@ -397,6 +414,8 @@ export function createStepsController({
     updateProgressBar();
 
     const currentStep = getCurrentStep();
+
+    restoreContinueButton(currentStep);
 
     startRevealForStep(currentStep);
 

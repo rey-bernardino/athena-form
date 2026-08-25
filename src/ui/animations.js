@@ -64,11 +64,18 @@ export function createAnimations({ config }) {
 
       if (mode === "show") {
         if (isSubmitStep && $submitBtn.length) {
-          $submitBtn.prop("disabled", false).removeClass("disabled");
+          $submitBtn
+            .prop("disabled", false)
+            .removeClass("disabled")
+            .css("pointer-events", "");
+
           return;
         }
 
         const $continueButton = $continueMask.children("div");
+
+        // Re-arm before animating so the button is tappable as it appears.
+        $continueMask.css("pointer-events", "");
 
         $continueMask
           .animate(
@@ -87,9 +94,20 @@ export function createAnimations({ config }) {
       }
 
       if (isSubmitStep && $submitBtn.length) {
-        $submitBtn.prop("disabled", true).addClass("disabled");
+        // disabled alone is not enough — the proceed control is often a div,
+        // where the property is inert.
+        $submitBtn
+          .prop("disabled", true)
+          .addClass("disabled")
+          .css("pointer-events", "none");
+
         return;
       }
+
+      // Kill taps immediately, not when the animation lands. The mask collapses
+      // to height/opacity 0 but keeps its hit area (and on mobile it is fixed to
+      // the bottom of the viewport), so it stays tappable while invisible.
+      $continueMask.css("pointer-events", "none");
 
       $continueMask
         .animate(
