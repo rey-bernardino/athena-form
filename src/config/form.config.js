@@ -42,6 +42,15 @@ export const FORM_CONFIG = {
     "hbform_q18_extrahelp_secondary"
   ],
 
+  // Fields written once the form finishes initializing, after the HubSpot-driven
+  // fields have been rendered. Applied in order: hdyhau_secondary is shown and
+  // cleared by the hdyhau_primary change handler, so the primary must come
+  // first. Select values must match the option values HubSpot returns.
+  autofillFields: [
+    { name: "hdyhau_primary", value: "Podcast" },
+    { name: "hdyhau_secondary", value: "Allin" },
+  ],
+
   progressSteps: [
     "8",
     "9",

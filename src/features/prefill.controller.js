@@ -183,15 +183,45 @@ export function createPrefillController({
     return prefillPairs;
   }
 
+  // Runs after hubspot.renderCustomFields(), so the custom selects exist by the
+  // time this writes to them. Values are applied in config order and dispatched
+  // as a real change, so the normal handlers run: solo is cleared, validation
+  // styling updates, and hdyhau_primary reveals hdyhau_secondary.
+  function applyAutofillFields() {
+    const autofillFields = config.autofillFields || [];
+
+    autofillFields.forEach(({ name, value }) => {
+      const $target = $(`[name="${name}"]`).not("[honey]");
+
+      if (!$target.length) {
+        console.warn(`Autofill field not found: ${name}`);
+        return;
+      }
+
+      $target.removeAttr("solo");
+      $target.val(value);
+
+      // A select silently ends up null when no option matches, which would
+      // otherwise look like the autofill worked.
+      if ($target.is("select") && $target.val() !== value) {
+        console.warn(`Autofill option not found for ${name}: ${value}`);
+      }
+
+      $target.trigger("change");
+    });
+  }
+
   function init() {
     updateUTMS();
     applyPrefillSteps();
+    applyAutofillFields();
   }
 
   return {
     init,
     updateUTMS,
     applyPrefillSteps,
+    applyAutofillFields,
     getPrefillPairs,
     applyParamsToFields,
     applyGa4Fields,
