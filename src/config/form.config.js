@@ -369,9 +369,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "1.0.1",
-    formEffectivityDate: "2026-07-13",
-    formVersionContext: "Bug Fix - Prevent double consecutive dots in email field",
+    formVersion: "B 1.0.2",
+    formEffectivityDate: "2026-08-25",
+    formVersionContext: "V3 adding progress bar and step 18",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
