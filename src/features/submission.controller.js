@@ -11,10 +11,7 @@ export function createSubmissionController({
   errorLogger,
   formSchema
 }) {
-  function setCallRedirectField(postSubmitAction) {
-    const fieldName = "growthtest_202608_chrislivelink";
-    const value = postSubmitAction === "redirect" ? "calledchris" : "";
-
+  function ensureHiddenField(fieldName) {
     let $field = $(`[name="${fieldName}"]`).first();
 
     if (!$field.length) {
@@ -22,8 +19,36 @@ export function createSubmissionController({
       $("#athn_form").append($field);
     }
 
+    return $field;
+  }
+
+  function writeField(fieldName, value) {
+    const $field = ensureHiddenField(fieldName);
+
     $field.val(value);
     $field.attr("value", value);
+  }
+
+  function setCallRedirectField(postSubmitAction) {
+    const value = postSubmitAction === "redirect" ? "calledchris" : "";
+
+    writeField("growthtest_202608_chrislivelink", value);
+  }
+
+  // MM/DD/YYYY in the visitor's own local time, stamped at submit rather than
+  // at load so it records when they actually sent the form.
+  function setConsentDateField() {
+    const consentConfig = config.consentDateField || {};
+
+    if (consentConfig.enabled === false) return;
+    if (!consentConfig.name) return;
+
+    const now = new Date();
+
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    writeField(consentConfig.name, `${month}/${day}/${now.getFullYear()}`);
   }
 
   function hasHoneypotValue() {
@@ -172,6 +197,7 @@ export function createSubmissionController({
       }
 
       setCallRedirectField(postSubmitAction);
+      setConsentDateField();
 
       const payload = hubspot.buildSubmissionPayload();
       await hubspot.submitForm(payload);

@@ -160,6 +160,13 @@ export const FORM_CONFIG = {
     "call-t3"
   ],
 
+  // Stamped at submit with the visitor's local date as MM/DD/YYYY. The input
+  // is created on #athn_form if the Webflow markup does not carry it.
+  consentDateField: {
+    enabled: true,
+    name: "optin_email_dateconsented",
+  },
+
   redirectUrls: {
     bannedCountry: "https://jobs.athena.com",
   },
