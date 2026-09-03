@@ -18,6 +18,13 @@ export const FORM_CONFIG = {
 
   animationTime: 300,
 
+  utm: {
+    // This form hardwires its UTM hidden inputs in Webflow. Off means nothing
+    // reads the URL or the _athn_utms cookie, and nothing overwrites those
+    // fields. GA4 client/session ids are unaffected.
+    enabled: false,
+  },
+
   excludedAttributionSteps: [
     "loading",
     "email",
@@ -47,7 +54,7 @@ export const FORM_CONFIG = {
   // cleared by the hdyhau_primary change handler, so the primary must come
   // first. Select values must match the option values HubSpot returns.
   autofillFields: [
-    { name: "hdyhau_primary", value: "Podcast" },
+    { name: "hdyhau_primary", value: "Events" },
     { name: "hdyhau_secondary", value: "Allin" },
   ],
 
@@ -98,7 +105,7 @@ export const FORM_CONFIG = {
 
   steps: {
     // First step faded in on page load. Also add it to noBackButtonSteps.
-    initialStep: "email",
+    initialStep: "info",
   },
 
   noBackButtonSteps: [

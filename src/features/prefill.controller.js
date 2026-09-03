@@ -97,7 +97,20 @@ export function createPrefillController({
     }
   }
 
+  function utmCaptureEnabled() {
+    return config.utm?.enabled !== false;
+  }
+
   function updateUTMS() {
+    // With capture off the UTM hidden inputs are whatever Webflow hardwired:
+    // nothing here reads the URL or the _athn_utms cookie, and nothing writes
+    // over those fields. GA4 client/session ids are not UTMs and still run.
+    if (!utmCaptureEnabled()) {
+      applyGa4Fields();
+
+      return state.utmParams;
+    }
+
     setDefaultUtms();
     applyUrlParams();
     applyUtmCookie();
