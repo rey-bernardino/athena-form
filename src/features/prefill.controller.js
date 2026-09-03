@@ -6,6 +6,7 @@ import { getUrlParams } from "../utils/url.js";
 export function createPrefillController({
   state,
   config,
+  validation,
 }) {
   function setDefaultUtms() {
     state.utmParams.utm_campaign = config.fallbackValue;
@@ -199,12 +200,37 @@ export function createPrefillController({
     return prefillPairs;
   }
 
+  // Webflow markup does not carry solo="" on every field (the email input is
+  // one that misses it), and solo is what tells validation "untouched, do not
+  // style this yet". Stamp it on the still-empty fields of a step we just
+  // wrote to, so the first validation run cannot flag a field the user has
+  // never touched. Every interaction handler still strips it on click/change.
+  function markUntouchedFields($step, autofilledNames) {
+    $step
+      .find("input, select")
+      .not("[honey]")
+      .not("[ignore]")
+      .not("[type=hidden]")
+      .each(function () {
+        const $field = $(this);
+
+        if (autofilledNames.includes($field.attr("name"))) return;
+        if ($field.attr("solo") !== undefined) return;
+        if (String($field.val() || "").trim() !== "") return;
+
+        $field.attr("solo", "");
+      });
+  }
+
   // Runs after hubspot.renderCustomFields(), so the custom selects exist by the
-  // time this writes to them. Values are applied in config order and dispatched
-  // as a real change, so the normal handlers run: solo is cleared, validation
-  // styling updates, and hdyhau_primary reveals hdyhau_secondary.
+  // time this writes to them. Values are written directly rather than through a
+  // change event: a change on page load runs the whole step's validation, which
+  // flags every still-empty field and disables the continue button before the
+  // user has typed anything.
   function applyAutofillFields() {
     const autofillFields = config.autofillFields || [];
+    const autofilledNames = [];
+    const touchedSteps = [];
 
     autofillFields.forEach(({ name, value }) => {
       const $target = $(`[name="${name}"]`).not("[honey]");
@@ -223,7 +249,24 @@ export function createPrefillController({
         console.warn(`Autofill option not found for ${name}: ${value}`);
       }
 
-      $target.trigger("change");
+      autofilledNames.push(name);
+
+      const step = $target.closest("[step]").attr("step");
+
+      if (step && !touchedSteps.includes(step)) {
+        touchedSteps.push(step);
+      }
+
+      // hdyhau_primary owns the secondary field's placeholder and visibility.
+      // Normally a change event reaches this through step validation; call it
+      // directly instead, so nothing else on the step gets validated yet.
+      if (name === "hdyhau_primary") {
+        validation?.updateHdyhauSecondary?.($target.val(), step);
+      }
+    });
+
+    touchedSteps.forEach((step) => {
+      markUntouchedFields($(`[step="${step}"]`), autofilledNames);
     });
   }
 

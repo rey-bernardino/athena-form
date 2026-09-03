@@ -201,6 +201,16 @@ export function createValidationService({
 
     $email.each(function () {
       const $field = $(this);
+
+      // Every other field type suppresses styling until solo is gone. Email
+      // did not, so a step validation triggered by any other field flagged an
+      // email the user had never touched. The proceed handler still strips
+      // solo across the step before validating, so nothing stops surfacing.
+      if (!shouldValidateField($field)) {
+        isValid = false;
+        return;
+      }
+
       const value = String($field.val() || "").trim();
 
       if (validateEmail(value) && !hasInvalidEmailDots(value)) {
@@ -393,6 +403,7 @@ export function createValidationService({
   return {
     validateStep,
     updateStepValidationUI,
+    updateHdyhauSecondary,
     validateEmail,
   };
 }

@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const prefill = createPrefillController({
         state,
         config: FORM_CONFIG,
+        validation,
     });
 
     const attribution = createAttributionService({

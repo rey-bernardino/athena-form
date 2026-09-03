@@ -336,6 +336,8 @@ export function bindEvents({
         state.nextLocked = true;
         state.backLocked = true;
 
+        $(this).removeAttr("solo");
+
         updateValidationForElement(this);
     });
 
@@ -354,7 +356,7 @@ export function bindEvents({
 
     $(document).on(
         "click.athenaForm",
-        "input[type='text']:not([honey]), #prettyPhone",
+        "input[type='text']:not([honey]), input[type='email'], #prettyPhone",
         function () {
             $(this).removeAttr("solo");
         }
