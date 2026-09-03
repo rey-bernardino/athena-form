@@ -10,7 +10,7 @@ export const FORM_CONFIG = {
 
   chili: {
     tenant: "athena",
-    router: "commercial-round-robin",
+    router: "all-in-event-flow",
     formIds: ["athn_form"],
   },
 
