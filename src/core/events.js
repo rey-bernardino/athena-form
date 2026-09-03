@@ -36,6 +36,9 @@ export function bindEvents({
     function isCallFlowEnabled() {
         const callStepConfig = config.callStep || {};
 
+        // Config wins over the Webflow global, not the other way round.
+        if (callStepConfig.enabled === false) return false;
+
         if (callStepConfig.requireWebflowGlobal === false) return true;
 
         const value =

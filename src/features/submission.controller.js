@@ -27,6 +27,8 @@ export function createSubmissionController({
   }
 
   function hasHoneypotValue() {
+    if (config.honeypot?.enabled === false) return false;
+
     const value = $("[honey]").val();
     return String(value || "").trim() !== "";
   }
@@ -52,6 +54,8 @@ export function createSubmissionController({
   }
 
   function isBannedCountry() {
+    if (config.bannedCountryRedirect?.enabled === false) return false;
+
     const countryCode = getSelectedCountryCode();
 
     return config.bannedCountries.includes(countryCode);

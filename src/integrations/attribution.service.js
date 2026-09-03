@@ -86,6 +86,8 @@ export function createAttributionService({
   }
 
   function fire(stepId = "", answers = [], fields = []) {
+    if (config.attribution?.enabled === false) return;
+
     if (!checkGA4()) return;
 
     const formattedFields = fields.join(";");

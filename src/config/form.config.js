@@ -37,6 +37,18 @@ export const FORM_CONFIG = {
     enabled: false,
   },
 
+  attribution: {
+    // GA4 dataLayer step events. Off silences attribution.fire() only —
+    // vowelCheck() is a submit-time spam gate, not analytics, and still runs.
+    enabled: false,
+  },
+
+  progressBar: {
+    // One step means nothing to track. Off leaves the bar unwritten and the
+    // [mask=progressbar] wrapper collapsed.
+    enabled: false,
+  },
+
   excludedAttributionSteps: [
     "loading",
     "email",
@@ -48,13 +60,15 @@ export const FORM_CONFIG = {
     "closed",
   ],
 
+  // Off for the bare form — the only rule belonged to quiz step 18. Kept here
+  // rather than deleted so the full flow can be restored in one edit.
   conditionalFields: [
-    {
-      field: "hbform_q18_extrahelp",
-      value: "other",
-      targetSelector: '[conditional="hbform_q18_extrahelp"]',
-      secondaryField: "hbform_q18_extrahelp_secondary"
-    }
+    // {
+    //   field: "hbform_q18_extrahelp",
+    //   value: "other",
+    //   targetSelector: '[conditional="hbform_q18_extrahelp"]',
+    //   secondaryField: "hbform_q18_extrahelp_secondary"
+    // }
   ],
 
   optionalBlankFields: [
@@ -104,6 +118,18 @@ export const FORM_CONFIG = {
     "success"
   ],
 
+  bannedCountryRedirect: {
+    // Off: no submit-time redirect on the phone field's selected country.
+    // The list below is kept intact for when it is switched back on.
+    enabled: false,
+  },
+
+  honeypot: {
+    // Off: the [honey] field is no longer checked at submit, and the
+    // .honeycontainer markup is left in the page.
+    enabled: false,
+  },
+
   bannedCountries: [
     "ph",
     "vn",
@@ -139,7 +165,7 @@ export const FORM_CONFIG = {
   },
 
   branching: {
-    enabled: true,
+    enabled: false,
 
     rules: {
       "1": {
@@ -157,7 +183,7 @@ export const FORM_CONFIG = {
   },
 
   referralRock: {
-    enabled: true,
+    enabled: false,
     debug: false,
 
     paramName: "REFERRALCODE",
@@ -350,7 +376,7 @@ export const FORM_CONFIG = {
   },
 
   formSchema: {
-    enabled: true,
+    enabled: false,
 
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
@@ -388,6 +414,10 @@ export const FORM_CONFIG = {
   },
 
   callStep: {
+    // Master off for the bare form. When false the call flow never runs, no
+    // matter what Webflow sets on webflowGlobals.call.
+    enabled: false,
+
     redirectUrl: "https://athenago.zoom.us/j/89937607407",
 
     // Master switch for the whole call flow. Set from Webflow at runtime:

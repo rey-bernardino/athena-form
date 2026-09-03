@@ -96,6 +96,8 @@ export function createStepsController({
   }
 
   function updateProgressBar() {
+    if (config.progressBar?.enabled === false) return;
+
     const $bar = dom.getProgressBar();
 
     if (!$bar.length) return;
@@ -130,6 +132,8 @@ export function createStepsController({
   }
 
   function shouldShowProgressBar(targetStepName) {
+    if (config.progressBar?.enabled === false) return false;
+
     return config.progressSteps.includes(targetStepName);
   }
 
