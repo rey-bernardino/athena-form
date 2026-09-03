@@ -240,7 +240,11 @@ export function createScoringController({
   function calculateAndWrite() {
     const result = calculate();
 
-    writeHiddenFields(result);
+    // Disabled scoring leaves the hidden fields alone rather than stamping
+    // them with score 0 / empty tier (ensureHiddenField would create them).
+    if (isEnabled()) {
+      writeHiddenFields(result);
+    }
 
     //console.log("Lead scoring result:", result);
 

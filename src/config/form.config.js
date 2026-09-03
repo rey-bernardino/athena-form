@@ -21,7 +21,19 @@ export const FORM_CONFIG = {
   utm: {
     // This form hardwires its UTM hidden inputs in Webflow. Off means nothing
     // reads the URL or the _athn_utms cookie, and nothing overwrites those
-    // fields. GA4 client/session ids are unaffected.
+    // fields.
+    enabled: false,
+  },
+
+  ga4: {
+    // ga4_clientid / ga4_sessionid capture from the _ga cookies. Off: this
+    // form is hardwired and does not need them.
+    enabled: false,
+  },
+
+  prefill: {
+    // URL-driven step prefill (pq/pv pairs), which stamps [skip][prefilled]
+    // on matching steps. Unrelated to autofillFields, which still runs.
     enabled: false,
   },
 
@@ -110,6 +122,7 @@ export const FORM_CONFIG = {
 
   noBackButtonSteps: [
     "1",
+    "info",
     "loading",
     "email",
     "loading_chili",
@@ -160,7 +173,7 @@ export const FORM_CONFIG = {
   },
 
   scoring: {
-    enabled: true,
+    enabled: false,
 
     outputFields: {
       score: "leadscoring_score",

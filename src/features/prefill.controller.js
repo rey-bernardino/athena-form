@@ -77,6 +77,8 @@ export function createPrefillController({
   }
 
   function applyGa4Fields() {
+    if (config.ga4?.enabled === false) return;
+
     const clientId = getGa4ClientId();
     const sessionId = getGa4SessionId();
 
@@ -104,10 +106,9 @@ export function createPrefillController({
   function updateUTMS() {
     // With capture off the UTM hidden inputs are whatever Webflow hardwired:
     // nothing here reads the URL or the _athn_utms cookie, and nothing writes
-    // over those fields. GA4 client/session ids are not UTMs and still run.
+    // over those fields. GA4 is a separate switch and self-guards.
     if (!utmCaptureEnabled()) {
       applyGa4Fields();
-
       return state.utmParams;
     }
 
@@ -167,6 +168,8 @@ export function createPrefillController({
   }
 
   function applyPrefillSteps() {
+    if (config.prefill?.enabled === false) return {};
+
     const prefillPairs = getPrefillPairs();
 
     Object.entries(prefillPairs).forEach(([fieldName, value]) => {
