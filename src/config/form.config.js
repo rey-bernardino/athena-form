@@ -19,16 +19,19 @@ export const FORM_CONFIG = {
   animationTime: 300,
 
   utm: {
-    // This form hardwires its UTM hidden inputs in Webflow. Off means nothing
-    // reads the URL or the _athn_utms cookie, and nothing overwrites those
-    // fields.
-    enabled: false,
+    // On: updateUTMS() reads the URL and the _athn_utms cookie and writes the
+    // utm_* / x_click_id hidden inputs. The enterprise-signup markup authors
+    // those inputs but leaves them empty, so with capture off they posted to
+    // HubSpot as blank strings even when the URL carried campaign params.
+    enabled: true,
   },
 
   ga4: {
-    // ga4_clientid / ga4_sessionid capture from the _ga cookies. Off: this
-    // form is hardwired and does not need them.
-    enabled: false,
+    // On: ga4_clientid / ga4_sessionid are filled from the _ga and
+    // _ga_F88E4P7L9R cookies. Like the utm_* inputs, the enterprise-signup
+    // markup authors these but leaves them empty, so with capture off they
+    // posted to HubSpot blank.
+    enabled: true,
   },
 
   prefill: {

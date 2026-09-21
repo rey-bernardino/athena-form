@@ -70,11 +70,19 @@ export function createPrefillController({
 
     const parts = gaSessionCookie.split(".");
 
-    if (parts.length > 2) {
-      return parts[2];
-    }
+    if (parts.length <= 2) return "";
 
-    return "";
+    const segment = parts[2];
+
+    // GA4 ships two cookie layouts. The old GS1 form is dot-delimited and puts
+    // the session id alone in this segment. The current GS2 form packs the rest
+    // of the cookie into this one segment as "s<sessionId>$o1$g1$t...", so
+    // returning it raw hands HubSpot the whole blob instead of an id.
+    const gs2SessionId = segment.match(/^s(\d+)/);
+
+    if (gs2SessionId) return gs2SessionId[1];
+
+    return segment;
   }
 
   function applyGa4Fields() {
