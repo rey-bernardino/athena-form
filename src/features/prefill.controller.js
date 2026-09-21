@@ -34,6 +34,18 @@ export function createPrefillController({
     });
   }
 
+  // A campaign param in the URL means this visit is a fresh touch. utm_content
+  // is included through "code", which applyUrlParams maps onto it. twclid is
+  // deliberately not a trigger: it only feeds x_click_id, never a utm_* field,
+  // so on its own it would blank the stored campaign rather than replace it.
+  function hasUrlAttribution() {
+    const urlParams = getUrlParams();
+
+    return Object.keys(urlParams).some(
+      (key) => key.startsWith("utm_") || key === "code"
+    );
+  }
+
   function applyUtmCookie() {
     const rawCookieValue = getCookie("_athn_utms");
 
@@ -123,7 +135,17 @@ export function createPrefillController({
 
     setDefaultUtms();
     applyUrlParams();
-    applyUtmCookie();
+
+    // Last touch. With campaign params in the URL the stored cookie must not
+    // fill in around them, or a partial link (utm_campaign only) would inherit
+    // the previous visit's source/medium/term/content and report as a blend of
+    // two touches. Whatever the URL leaves unset stays on the fallback value.
+    // With no campaign params there is no new touch, so the cookie still
+    // supplies the previous one.
+    if (!hasUrlAttribution()) {
+      applyUtmCookie();
+    }
+
     applyParamsToFields();
     applyGa4Fields();
 
