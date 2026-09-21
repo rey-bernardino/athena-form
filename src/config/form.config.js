@@ -41,9 +41,11 @@ export const FORM_CONFIG = {
   },
 
   attribution: {
-    // GA4 dataLayer step events. Off silences attribution.fire() only —
-    // vowelCheck() is a submit-time spam gate, not analytics, and still runs.
-    enabled: false,
+    // GA4 dataLayer step events, matching callflowmerge, which has no such
+    // flag and so always fires. Off silenced every athena_attribution push,
+    // including the calendar conversion event. vowelCheck() is a submit-time
+    // spam gate, not analytics, and ran either way.
+    enabled: true,
   },
 
   progressBar: {
