@@ -143,12 +143,13 @@ export const FORM_CONFIG = {
 
   steps: {
     // First step faded in on page load. Also add it to noBackButtonSteps.
-    initialStep: "info",
+    // Enterprise flow is email -> info; info still carries [cmd=proceed][last]
+    // and is the step that submits.
+    initialStep: "email",
   },
 
   noBackButtonSteps: [
     "1",
-    "info",
     "loading",
     "email",
     "loading_chili",
@@ -388,9 +389,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "All In Bare Form",
-    formEffectivityDate: "2026-08-19",
-    formVersionContext: "Initial",
+    formVersion: "Enterprise 1.0.0a",
+    formEffectivityDate: "2026-09-21",
+    formVersionContext: "Initial Form version for Enterprise signup",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
