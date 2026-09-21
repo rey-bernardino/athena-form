@@ -10,7 +10,7 @@ export const FORM_CONFIG = {
 
   chili: {
     tenant: "athena",
-    router: "all-in-event-flow",
+    router: "commercial-round-robin",
     formIds: ["athn_form"],
   },
 
@@ -79,10 +79,10 @@ export const FORM_CONFIG = {
   // fields have been rendered. Applied in order: hdyhau_secondary is shown and
   // cleared by the hdyhau_primary change handler, so the primary must come
   // first. Select values must match the option values HubSpot returns.
-  autofillFields: [
-    { name: "hdyhau_primary", value: "Events" },
-    { name: "hdyhau_secondary", value: "Allin" },
-  ],
+  //
+  // Empty for the enterprise form — the visitor answers hdyhau themselves. The
+  // All In event build hardwired this to Events / Allin.
+  autofillFields: [],
 
   progressSteps: [
     "8",
