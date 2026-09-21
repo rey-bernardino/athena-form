@@ -163,8 +163,12 @@ export const FORM_CONFIG = {
 
   // Stamped at submit with the visitor's local date as MM/DD/YYYY. The input
   // is created on #athn_form if the Webflow markup does not carry it.
+  //
+  // Off for the enterprise form: nothing writes optin_email_dateconsented.
+  // The enterprise-signup markup does not carry that input, so with this off
+  // the field drops out of the payload entirely rather than posting blank.
   consentDateField: {
-    enabled: true,
+    enabled: false,
     name: "optin_email_dateconsented",
   },
 
@@ -384,7 +388,10 @@ export const FORM_CONFIG = {
   },
 
   formSchema: {
-    enabled: false,
+    // Must stay on for versioning to reach HubSpot: writeSnapshot() returns
+    // early when this is false, so neither leadformversion nor leadformjson
+    // gets written and neither appears in the submission payload.
+    enabled: true,
 
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
