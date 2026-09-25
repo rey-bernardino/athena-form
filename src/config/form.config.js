@@ -10,7 +10,7 @@ export const FORM_CONFIG = {
 
   chili: {
     tenant: "athena",
-    router: "commercial-round-robin",
+    router: "enterprise-lp-router",
     formIds: ["athn_form"],
   },
 
@@ -402,8 +402,8 @@ export const FORM_CONFIG = {
     outputVersionField: "leadformversion",
 
     formVersion: "Enterprise 1.0.0a",
-    formEffectivityDate: "2026-09-21",
-    formVersionContext: "Initial Form version for Enterprise signup",
+    formEffectivityDate: "2026-09-26",
+    formVersionContext: "Added enterprise router",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
