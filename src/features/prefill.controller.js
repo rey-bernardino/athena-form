@@ -315,7 +315,17 @@ export function createPrefillController({
       const paramValue = String(urlParams[rule.param] || "").trim();
 
       if (!paramValue) return;
-      if (paramValue.toLowerCase() !== String(rule.value || "").toLowerCase()) return;
+
+      const hasMatchValue = rule.value !== undefined;
+
+      if (
+        hasMatchValue &&
+        paramValue.toLowerCase() !== String(rule.value).toLowerCase()
+      ) {
+        return;
+      }
+
+      const fieldValue = hasMatchValue ? rule.value : paramValue;
 
       let $field = $(`[name="${rule.field}"]`).first();
 
@@ -324,8 +334,8 @@ export function createPrefillController({
         $("#athn_form").append($field);
       }
 
-      $field.val(rule.value);
-      $field.attr("value", rule.value);
+      $field.val(fieldValue);
+      $field.attr("value", fieldValue);
     });
   }
 

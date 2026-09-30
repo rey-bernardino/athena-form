@@ -177,16 +177,25 @@ export const FORM_CONFIG = {
     name: "optin_email_dateconsented",
   },
 
-  // Stamped at submit: when the URL carries param=value (matched
-  // case-insensitively), the configured value is written to `field` on
-  // #athn_form. The input is created if the Webflow markup does not carry it.
-  // No match means nothing is written.
+  // Written on load, after the UTMs. With `value` set, the URL must carry
+  // param=value (matched case-insensitively) and the configured value is
+  // written to `field`. Without `value`, whatever the URL carries for `param`
+  // is copied into `field` as-is. The input is created on #athn_form if the
+  // Webflow markup does not carry it. No match / no param writes nothing.
+  //
+  // Independent of prefill.enabled: pv1 here is a plain param, not a pq/pv
+  // step prefill pair, and never skips a step.
   urlParamStamps: [
     {
       id: "specialist_assistant_lp",
       param: "lp",
       value: "Specialistlp-marketing",
       field: "formstamp_specialistassistantlp",
+    },
+    {
+      id: "role_description_pv1",
+      param: "pv1",
+      field: "hbform_q9_role_description",
     },
   ],
 
