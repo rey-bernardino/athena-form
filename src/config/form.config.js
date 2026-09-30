@@ -177,6 +177,19 @@ export const FORM_CONFIG = {
     name: "optin_email_dateconsented",
   },
 
+  // Stamped at submit: when the URL carries param=value (matched
+  // case-insensitively), the configured value is written to `field` on
+  // #athn_form. The input is created if the Webflow markup does not carry it.
+  // No match means nothing is written.
+  urlParamStamps: [
+    {
+      id: "specialist_assistant_lp",
+      param: "lp",
+      value: "Specialistlp-marketing",
+      field: "formstamp_specialistassistantlp",
+    },
+  ],
+
   redirectUrls: {
     bannedCountry: "https://jobs.athena.com",
   },
