@@ -1,7 +1,5 @@
 // src/features/submission.controller.js
 
-import { getUrlParams } from "../utils/url.js";
-
 export function createSubmissionController({
   state,
   config,
@@ -51,25 +49,6 @@ export function createSubmissionController({
     const day = String(now.getDate()).padStart(2, "0");
 
     writeField(consentConfig.name, `${month}/${day}/${now.getFullYear()}`);
-  }
-
-  function setUrlParamStamps() {
-    const rules = config.urlParamStamps || [];
-
-    if (!rules.length) return;
-
-    const urlParams = getUrlParams();
-
-    rules.forEach((rule) => {
-      if (!rule?.param || !rule?.field) return;
-
-      const paramValue = String(urlParams[rule.param] || "").trim();
-
-      if (!paramValue) return;
-      if (paramValue.toLowerCase() !== String(rule.value || "").toLowerCase()) return;
-
-      writeField(rule.field, rule.value);
-    });
   }
 
   function hasHoneypotValue() {
@@ -219,7 +198,6 @@ export function createSubmissionController({
 
       setCallRedirectField(postSubmitAction);
       setConsentDateField();
-      setUrlParamStamps();
 
       const payload = hubspot.buildSubmissionPayload();
       await hubspot.submitForm(payload);

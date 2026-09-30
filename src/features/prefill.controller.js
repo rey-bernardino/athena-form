@@ -300,8 +300,38 @@ export function createPrefillController({
     });
   }
 
+  // Runs on load alongside the UTMs so the value is already in #athn_form
+  // whenever the payload is built. No match means nothing is written.
+  function applyUrlParamStamps() {
+    const rules = config.urlParamStamps || [];
+
+    if (!rules.length) return;
+
+    const urlParams = getUrlParams();
+
+    rules.forEach((rule) => {
+      if (!rule?.param || !rule?.field) return;
+
+      const paramValue = String(urlParams[rule.param] || "").trim();
+
+      if (!paramValue) return;
+      if (paramValue.toLowerCase() !== String(rule.value || "").toLowerCase()) return;
+
+      let $field = $(`[name="${rule.field}"]`).first();
+
+      if (!$field.length) {
+        $field = $(`<input type="hidden" name="${rule.field}" id="${rule.field}">`);
+        $("#athn_form").append($field);
+      }
+
+      $field.val(rule.value);
+      $field.attr("value", rule.value);
+    });
+  }
+
   function init() {
     updateUTMS();
+    applyUrlParamStamps();
     applyPrefillSteps();
     applyAutofillFields();
   }
@@ -314,5 +344,6 @@ export function createPrefillController({
     getPrefillPairs,
     applyParamsToFields,
     applyGa4Fields,
+    applyUrlParamStamps,
   };
 }
