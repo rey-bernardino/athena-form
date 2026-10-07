@@ -187,9 +187,10 @@ export const FORM_CONFIG = {
   // step prefill pair, and never skips a step.
   urlParamStamps: [
     {
+      // No `value`: every Specialist LP (Specialistlp-marketing,
+      // Specialistlp-bookkeeping, ...) stamps its own lp as-is.
       id: "specialist_assistant_lp",
       param: "lp",
-      value: "Specialistlp-marketing",
       field: "formstamp_specialistassistantlp",
     },
     {
