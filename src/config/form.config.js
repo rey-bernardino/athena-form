@@ -424,9 +424,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "Specialist Form 1.0.0",
-    formEffectivityDate: "2026-10-01",
-    formVersionContext: "Initial",
+    formVersion: "Specialist 1.0.1",
+    formEffectivityDate: "2026-10-09",
+    formVersionContext: "Stamp any lp value + versioning alignment",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
