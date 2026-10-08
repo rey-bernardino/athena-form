@@ -401,9 +401,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "Enterprise 1.0.0a",
-    formEffectivityDate: "2026-09-26",
-    formVersionContext: "Added enterprise router",
+    formVersion: "Enterprise 1.0.0",
+    formEffectivityDate: "2026-10-09",
+    formVersionContext: "Versioning alignment",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
