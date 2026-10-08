@@ -240,7 +240,10 @@ export function createScoringController({
   function calculateAndWrite() {
     const result = calculate();
 
-    writeHiddenFields(result);
+    // Disabled: leave leadscoring_* untouched so HubSpot doesn't receive a 0 score.
+    if (isEnabled()) {
+      writeHiddenFields(result);
+    }
 
     //console.log("Lead scoring result:", result);
 

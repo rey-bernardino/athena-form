@@ -139,7 +139,7 @@ export const FORM_CONFIG = {
   },
 
   scoring: {
-    enabled: true,
+    enabled: false,
 
     outputFields: {
       score: "leadscoring_score",
@@ -321,9 +321,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "1.1.1",
-    formEffectivityDate: "2026-08-19",
-    formVersionContext: "Fixed Phantom Button on mobile",
+    formVersion: "Main 1.1.2",
+    formEffectivityDate: "2026-10-09",
+    formVersionContext: "Disable lead scoring + audit",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
@@ -354,6 +354,10 @@ export const FORM_CONFIG = {
   },
 
   callStep: {
+    // Hard off switch, baked into the bundle. When false the call flow stays
+    // off no matter what Webflow sets in webflowGlobals.call.
+    enabled: false,
+
     redirectUrl: "https://athenago.zoom.us/j/89937607407",
 
     // Master switch for the whole call flow. Set from Webflow at runtime:

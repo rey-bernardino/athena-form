@@ -41,6 +41,16 @@ export function createVisibilityController({
     function isWebflowGlobalEnabled(key) {
         if (!key) return false;
 
+        // The bundle's hard off switch wins over whatever Webflow sets.
+        const callStepConfig = config.callStep || {};
+
+        if (
+            callStepConfig.enabled === false &&
+            key === (callStepConfig.webflowGlobalKey || "call")
+        ) {
+            return false;
+        }
+
         const value = window.AthenaForm?.webflowGlobals?.[key];
 
         // Accept "true" too — Webflow embeds often stringify values.

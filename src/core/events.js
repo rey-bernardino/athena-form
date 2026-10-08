@@ -36,6 +36,8 @@ export function bindEvents({
     function isCallFlowEnabled() {
         const callStepConfig = config.callStep || {};
 
+        if (callStepConfig.enabled === false) return false;
+
         if (callStepConfig.requireWebflowGlobal === false) return true;
 
         const value =
