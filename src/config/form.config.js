@@ -155,7 +155,7 @@ export const FORM_CONFIG = {
   },
 
   scoring: {
-    enabled: true,
+    enabled: false,
 
     outputFields: {
       score: "leadscoring_score",
@@ -409,9 +409,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "B 1.0.2",
-    formEffectivityDate: "2026-08-25",
-    formVersionContext: "V3 adding progress bar and step 18",
+    formVersion: "Transition 1.0.3",
+    formEffectivityDate: "2026-10-09",
+    formVersionContext: "Disable lead scoring + versioning alignment",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
