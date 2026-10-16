@@ -1,0 +1,1771 @@
+{
+  "name": "lead_tier_v0",
+  "form": "Transition 1.0.3",
+  "generatedFrom": {
+    "extractedOn": "2026-10-16",
+    "windows": {
+      "baseline": [
+        "2026-01-22",
+        "2026-06-15"
+      ],
+      "validation": [
+        "2026-05-16",
+        "2026-06-15"
+      ],
+      "test": [
+        "2026-06-16",
+        "2026-09-16"
+      ]
+    },
+    "targets": {
+      "tier1MinRate": 0.6,
+      "tier3MaxRate": 0.2,
+      "minTierDeals": 100
+    }
+  },
+  "methodSelection": [
+    {
+      "method": "exam",
+      "validationAuc": 0.7053762114142139
+    },
+    {
+      "method": "fitted",
+      "validationAuc": 0.7119986091170136
+    }
+  ],
+  "method": "fitted",
+  "derivedOn": [
+    "2026-01-22",
+    "2026-06-15"
+  ],
+  "baselineRate": 0.43455775096141097,
+  "nDeals": 7541,
+  "scale": "percent_of_asked",
+  "questions": [
+    {
+      "id": "utm_medium",
+      "label": "Traffic medium (utm_medium)",
+      "source": "utm",
+      "field": "utm_medium",
+      "aggregate": "sum",
+      "maxPoints": 8,
+      "defaultPoints": 4,
+      "aliases": {
+        "paid-social": "paid_social",
+        "paid_sea": "paid_search",
+        "cpc": "paid_search",
+        "client_referral": "clientreferral",
+        "vip-referral": "clientreferral",
+        "referral_profile": "referral",
+        "organic_social": "social"
+      },
+      "options": {
+        "referral": 8,
+        "clientreferral": 8,
+        "paid_search": 6,
+        "athena20122740": 6,
+        "affiliate": 4,
+        "social": 2,
+        "paid_social": 0
+      }
+    },
+    {
+      "id": "hdyhau_primary",
+      "label": "How did you hear about us? (primary)",
+      "source": "field",
+      "field": "hdyhau_primary",
+      "aggregate": "sum",
+      "maxPoints": 20,
+      "defaultPoints": 10,
+      "options": {
+        "Referral": 20,
+        "Podcast": 16,
+        "Other": 14,
+        "Partnership": 14,
+        "ChatGPT": 13,
+        "Blog or Publication": 11,
+        "Youtube": 9,
+        "Google": 8,
+        "LinkedIn": 8,
+        "Twitter": 8,
+        "Instagram": 6,
+        "Bing": 6,
+        "Facebook": 3,
+        "Tiktok": 0
+      }
+    },
+    {
+      "id": "hbform_q1_worked_with_an_assistant",
+      "label": "Have you ever worked with an executive assistant?",
+      "source": "field",
+      "field": "hbform_q1_worked_with_an_assistant",
+      "aggregate": "sum",
+      "maxPoints": 3,
+      "defaultPoints": 1,
+      "aliases": {
+        "Yes_previously": "yes_but_not_currently"
+      },
+      "options": {
+        "yes_i_have_one_now": 3,
+        "yes_but_not_currently": 2,
+        "no_never": 0
+      }
+    },
+    {
+      "id": "hbform_q2_current_workload",
+      "label": "Which best describes your current workload?",
+      "source": "field",
+      "field": "hbform_q2_current_workload",
+      "aggregate": "sum",
+      "maxPoints": 5,
+      "defaultPoints": 4,
+      "options": {
+        "busy_but_under_control": 5,
+        "overloaded": 4,
+        "constantly_firefighting": 4,
+        "manageable": 0
+      }
+    },
+    {
+      "id": "hbform_q4_how_often_do_lowvalue_tasks_interrupt_your_day",
+      "label": "How often do low-value tasks interrupt your day?",
+      "source": "field",
+      "field": "hbform_q4_how_often_do_lowvalue_tasks_interrupt_your_day",
+      "aggregate": "sum",
+      "maxPoints": 8,
+      "defaultPoints": 8,
+      "options": {
+        "constantly": 8,
+        "a_few_times_a_day": 8,
+        "rarely": 0
+      }
+    },
+    {
+      "id": "hbform_q5_day_to_day_tasks",
+      "label": "Which of these work tasks eat up the most time in your week?",
+      "source": "field",
+      "field": "hbform_q5_day_to_day_tasks",
+      "aggregate": "max",
+      "maxPoints": 2,
+      "defaultPoints": 1,
+      "options": {
+        "travel_planning_booking": 2,
+        "vendor_logistics_coordination": 1,
+        "owning_followups_and_accountability": 1,
+        "research_data_entry": 0,
+        "calendar__scheduling": 0,
+        "document_formatting_organization": 0,
+        "expense_tracking_receipts_reimbursements": 0,
+        "all_of_the_above_most_popular": 0,
+        "email_inbox_management": 0
+      }
+    },
+    {
+      "id": "hbform_q6_high_leverage_work_responsibilities",
+      "label": "Which higher-leverage work responsibilities would you most want support with?",
+      "source": "field",
+      "field": "hbform_q6_high_leverage_work_responsibilities",
+      "aggregate": "max",
+      "maxPoints": 1,
+      "defaultPoints": 1,
+      "aliases": {
+        "project_coordination": "project_coordination_across_teams",
+        "meeting_prep_and_summaries": "preparing_briefs_summaries_and_agendas",
+        "content_coordination": "content_coordination_social_blog_internal"
+      },
+      "options": {
+        "hiring_coordination_interview_logistics": 1,
+        "preparing_briefs_summaries_and_agendas": 1,
+        "project_coordination_across_teams": 1,
+        "event_planning_execution": 1,
+        "managing_recurring_workflows": 1,
+        "process_documentation_sops": 1,
+        "content_coordination_social_blog_internal": 0,
+        "all_of_the_above": 0
+      }
+    },
+    {
+      "id": "hbform_q7_personal_logistics",
+      "label": "Outside of work, where do you lose the most time?",
+      "source": "field",
+      "field": "hbform_q7_personal_logistics",
+      "aggregate": "max",
+      "maxPoints": 1,
+      "defaultPoints": 1,
+      "options": {
+        "travel_logistics_for_personal_trips": 1,
+        "property_maintenance_coordination": 1,
+        "childcare_logistics_scheduling": 1,
+        "document_management_insurance_records_files": 1,
+        "home_service_scheduling_repairs_cleaning_utilities": 1,
+        "bill_payment_personal_expense_coordination": 0,
+        "household_inventory_supply_management": 0,
+        "kids_school_or_activity_coordination": 0,
+        "all_of_the_above": 0
+      }
+    },
+    {
+      "id": "hbform_q8_planning_or_errand_tasks",
+      "label": "Which personal planning or errand-related tasks would you most want support with?",
+      "source": "field",
+      "field": "hbform_q8_planning_or_errand_tasks",
+      "aggregate": "max",
+      "maxPoints": 2,
+      "defaultPoints": 1,
+      "aliases": {
+        "research_for_personal_decisions": "research_for_personal_decisions_schools_services_trips",
+        "Planning_personal_commitments": "planning_upcoming_personal_commitments",
+        "grocery_shopping_errands": "grocery_shopping_recurring_errands",
+        "gift_buying": "gift_buying_for_family_friends",
+        "party_or_event_planning": "party_or_event_planning_birthdays_celebrations"
+      },
+      "options": {
+        "gift_buying_for_family_friends": 2,
+        "planning_upcoming_personal_commitments": 1,
+        "research_for_personal_decisions_schools_services_trips": 1,
+        "party_or_event_planning_birthdays_celebrations": 1,
+        "personal_shopping": 1,
+        "meal_planning_coordination": 0,
+        "grocery_shopping_recurring_errands": 0,
+        "all_of_the_above": 0
+      }
+    },
+    {
+      "id": "hbform_q9_role_description",
+      "label": "What best describes your role?",
+      "source": "field",
+      "field": "hbform_q9_role_description",
+      "aggregate": "sum",
+      "maxPoints": 5,
+      "defaultPoints": 4,
+      "aliases": {
+        "founder_or_cofounder": "entrepreneur_or_founder",
+        "ceo_or_president": "vp_executive_csuite",
+        "executive_c-level_vp": "vp_executive_csuite",
+        "corporate_executive": "vp_executive_csuite",
+        "small_business_owner": "business_owner"
+      },
+      "options": {
+        "vp_executive_csuite": 5,
+        "entrepreneur_or_founder": 4,
+        "business_owner": 3,
+        "other": 0
+      }
+    },
+    {
+      "id": "hbform_q12_predictability",
+      "label": "How predictable are your days?",
+      "source": "field",
+      "field": "hbform_q12_predictability",
+      "aggregate": "sum",
+      "maxPoints": 2,
+      "defaultPoints": 1,
+      "options": {
+        "it_varies_week_to_week": 2,
+        "mostly_predictable": 1,
+        "somewhat_unpredictable": 1,
+        "very_unpredictable": 0
+      }
+    },
+    {
+      "id": "hbform_q13_stuck_on_tasks",
+      "label": "When you are stuck doing low-value tasks, how does it cost you?",
+      "source": "field",
+      "field": "hbform_q13_stuck_on_tasks",
+      "aggregate": "max",
+      "maxPoints": 6,
+      "defaultPoints": 4,
+      "aliases": {
+        "deep_focused work": "deep_work_gets_fragmented",
+        "strategic_and_planning work": "strategic_or_planning_work_gets_pushed",
+        "revenue_and_growth_activities": "revenue_or_growth_activities_get_delayed",
+        "health_and_personal_time": "i_dont_have_time_to_prioritize_my_health",
+        "Reaching_my_goals": "i_dont_achieve_my_most_important_goals",
+        "Time_with_family": "i_spend_less_time_with_my_spouse_and_kids"
+      },
+      "options": {
+        "deep_work_gets_fragmented": 6,
+        "strategic_or_planning_work_gets_pushed": 6,
+        "revenue_or_growth_activities_get_delayed": 5,
+        "im_not_reaching_my_potential": 4,
+        "i_dont_achieve_my_most_important_goals": 3,
+        "i_spend_less_time_with_my_spouse_and_kids": 3,
+        "i_dont_have_time_to_prioritize_my_health": 2,
+        "i_dont_feel_a_meaningful_tradeoff": 0
+      }
+    },
+    {
+      "id": "hbform_q15_concerns_on_hiring",
+      "label": "Do you have any concerns about hiring an EA?",
+      "source": "field",
+      "field": "hbform_q15_concerns_on_hiring",
+      "aggregate": "max",
+      "maxPoints": 6,
+      "defaultPoints": 4,
+      "aliases": {
+        "trusting_them_with_important_tasks": "fear_of_trusting_an_ea_with_important_tasks"
+      },
+      "options": {
+        "finding_highquality_talent": 6,
+        "privacy_and_data_security": 5,
+        "poor_experiences_with_prior_eas": 5,
+        "fear_of_trusting_an_ea_with_important_tasks": 4,
+        "not_sure_what_to_delegate": 3,
+        "cost_and_budget_fit": 0,
+        "other": 0
+      }
+    },
+    {
+      "id": "hbform_q16_what_do_you_want",
+      "label": "What do you want more of right now?",
+      "source": "field",
+      "field": "hbform_q16_what_do_you_want",
+      "aggregate": "sum",
+      "maxPoints": 3,
+      "defaultPoints": 2,
+      "options": {
+        "time": 3,
+        "focus": 3,
+        "all_four": 2,
+        "freedom": 0,
+        "calm": 0
+      }
+    },
+    {
+      "id": "hbform_q17_timeline",
+      "label": "What is your timeline for getting help?",
+      "source": "field",
+      "field": "hbform_q17_timeline",
+      "aggregate": "sum",
+      "maxPoints": 6,
+      "defaultPoints": 5,
+      "aliases": {
+        "ASAP": "asap_this_is_a_priority",
+        "still_exploring": "just_exploring_for_now",
+        "next_2-3_months": "in_the_next_23_months"
+      },
+      "options": {
+        "asap_this_is_a_priority": 6,
+        "within_the_next_month": 5,
+        "in_the_next_23_months": 2,
+        "just_exploring_for_now": 0
+      }
+    },
+    {
+      "id": "hbform_q3_v2_timeback",
+      "label": "What have you tried so far to get your time back?",
+      "source": "field",
+      "field": "hbform_q3_v2_timeback",
+      "aggregate": "sum",
+      "maxPoints": 2,
+      "defaultPoints": 1,
+      "options": {
+        "a_mix_of_the_above": 2,
+        "havent_tried_anything_systematically": 0,
+        "ai_tools_and_automation": 0,
+        "just_pushing_through": 0
+      }
+    },
+    {
+      "id": "hbform_q7_v2_biggestwin",
+      "label": "If you had a trusted EA starting next Monday, what would be the biggest win?",
+      "source": "field",
+      "field": "hbform_q7_v2_biggestwin",
+      "aggregate": "sum",
+      "maxPoints": 1,
+      "defaultPoints": 0,
+      "options": {
+        "a_proactive_partner_who_anticipates_needs_before_i_ask": 1,
+        "never_missing_a_detail_followup_or_deadline_again": 0,
+        "real_time_back_for_family_health_or_personal_priorities": 0,
+        "p_10_hours_a_week_back_for_highleverage_work": 0
+      }
+    },
+    {
+      "id": "hbform_q18_v2_90days",
+      "label": "If nothing changes in the next 90 days, what's most likely to happen?",
+      "source": "field",
+      "field": "hbform_q18_v2_90days",
+      "aggregate": "sum",
+      "maxPoints": 2,
+      "defaultPoints": 1,
+      "options": {
+        "ill_keep_managing_but_important_things_will_slip": 2,
+        "ill_miss_opportunities_i_cant_get_back": 1,
+        "honestly__ill_be_saying_this_same_thing_in_90_days": 1,
+        "ill_be_closer_to_burnout": 0
+      }
+    }
+  ],
+  "diagnostics": [
+    {
+      "field": "utm_medium",
+      "label": "Traffic medium (utm_medium)",
+      "coverage": 7541,
+      "weight": 0.5915973757402289,
+      "cap": 8,
+      "defaultPoints": 4,
+      "options": [
+        {
+          "key": "referral",
+          "label": "Referral",
+          "n": 109,
+          "rate": 0.6880733944954128,
+          "shrunk": 0.6083514940130224,
+          "points": 8,
+          "kept": true
+        },
+        {
+          "key": "clientreferral",
+          "label": "Client referral",
+          "n": 37,
+          "rate": 0.8108108108108109,
+          "shrunk": 0.5945734200927649,
+          "points": 8,
+          "kept": true
+        },
+        {
+          "key": "paid_search",
+          "label": "Paid search",
+          "n": 1760,
+          "rate": 0.5153409090909091,
+          "shrunk": 0.5131093301370555,
+          "points": 6,
+          "kept": true
+        },
+        {
+          "key": "athena20122740",
+          "label": "No UTM (direct / untracked)",
+          "n": 3061,
+          "rate": 0.5073505390395295,
+          "shrunk": 0.50618061316235,
+          "points": 6,
+          "kept": true
+        },
+        {
+          "key": "newsletter",
+          "label": "Newsletter",
+          "n": 4,
+          "rate": 1,
+          "shrunk": 0.47644236200130646,
+          "points": 4,
+          "kept": false
+        },
+        {
+          "key": "affiliate",
+          "label": "Affiliate",
+          "n": 66,
+          "rate": 0.4696969696969697,
+          "shrunk": 0.4545507547247461,
+          "points": 4,
+          "kept": true
+        },
+        {
+          "key": "email",
+          "label": "Email",
+          "n": 3,
+          "rate": 0.6666666666666666,
+          "shrunk": 0.4476959914730292,
+          "points": 4,
+          "kept": false
+        },
+        {
+          "key": "kol",
+          "label": "KOL",
+          "n": 2,
+          "rate": 0.5,
+          "shrunk": 0.43707476053981825,
+          "points": 4,
+          "kept": false
+        },
+        {
+          "key": "social",
+          "label": "Social",
+          "n": 131,
+          "rate": 0.29770992366412213,
+          "shrunk": 0.33551319087331793,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "paid_social",
+          "label": "Paid social",
+          "n": 2368,
+          "rate": 0.26815878378378377,
+          "shrunk": 0.2715996226418819,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hdyhau_primary",
+      "label": "How did you hear about us? (primary)",
+      "coverage": 7541,
+      "weight": 1.3989582923521682,
+      "cap": 20,
+      "defaultPoints": 10,
+      "options": [
+        {
+          "key": "referral",
+          "label": "Referral",
+          "n": 594,
+          "rate": 0.7053872053872053,
+          "shrunk": 0.6843600738324077,
+          "points": 20,
+          "kept": true
+        },
+        {
+          "key": "podcast",
+          "label": "Podcast",
+          "n": 1655,
+          "rate": 0.5861027190332326,
+          "shrunk": 0.5816585850721822,
+          "points": 16,
+          "kept": true
+        },
+        {
+          "key": "other",
+          "label": "Other",
+          "n": 439,
+          "rate": 0.5535307517084282,
+          "shrunk": 0.5413658232066882,
+          "points": 14,
+          "kept": true
+        },
+        {
+          "key": "partnership",
+          "label": "Partnership",
+          "n": 53,
+          "rate": 0.6037735849056604,
+          "shrunk": 0.5216299761948597,
+          "points": 14,
+          "kept": true
+        },
+        {
+          "key": "chatgpt",
+          "label": "ChatGPT",
+          "n": 173,
+          "rate": 0.5144508670520231,
+          "shrunk": 0.49653761232318633,
+          "points": 13,
+          "kept": true
+        },
+        {
+          "key": "events",
+          "label": "Events",
+          "n": 8,
+          "rate": 0.75,
+          "shrunk": 0.47806702669087153,
+          "points": 10,
+          "kept": false
+        },
+        {
+          "key": "blog or publication",
+          "label": "Blog or Publication",
+          "n": 38,
+          "rate": 0.5,
+          "shrunk": 0.46281690395534714,
+          "points": 11,
+          "kept": true
+        },
+        {
+          "key": "newsletter",
+          "label": "Newsletter",
+          "n": 5,
+          "rate": 0.4,
+          "shrunk": 0.4314161372376463,
+          "points": 10,
+          "kept": false
+        },
+        {
+          "key": "reddit",
+          "label": "Reddit",
+          "n": 12,
+          "rate": 0.4166666666666667,
+          "shrunk": 0.43109496045275075,
+          "points": 10,
+          "kept": false
+        },
+        {
+          "key": "youtube",
+          "label": "Youtube",
+          "n": 171,
+          "rate": 0.40350877192982454,
+          "shrunk": 0.4105334278193238,
+          "points": 9,
+          "kept": true
+        },
+        {
+          "key": "physical mail",
+          "label": "Physical Mail",
+          "n": 8,
+          "rate": 0.25,
+          "shrunk": 0.4091015094494922,
+          "points": 10,
+          "kept": false
+        },
+        {
+          "key": "google",
+          "label": "Google",
+          "n": 1358,
+          "rate": 0.38880706921944036,
+          "shrunk": 0.39043173831539096,
+          "points": 8,
+          "kept": true
+        },
+        {
+          "key": "kol",
+          "label": "KOL",
+          "n": 14,
+          "rate": 0.21428571428571427,
+          "shrunk": 0.3863732429386023,
+          "points": 10,
+          "kept": false
+        },
+        {
+          "key": "linkedin",
+          "label": "LinkedIn",
+          "n": 153,
+          "rate": 0.3660130718954248,
+          "shrunk": 0.38289599777374655,
+          "points": 8,
+          "kept": true
+        },
+        {
+          "key": "twitter",
+          "label": "Twitter",
+          "n": 220,
+          "rate": 0.35454545454545455,
+          "shrunk": 0.36936254647433536,
+          "points": 8,
+          "kept": true
+        },
+        {
+          "key": "instagram",
+          "label": "Instagram",
+          "n": 1616,
+          "rate": 0.3310643564356436,
+          "shrunk": 0.33417040068911796,
+          "points": 6,
+          "kept": true
+        },
+        {
+          "key": "bing",
+          "label": "Bing",
+          "n": 27,
+          "rate": 0.14814814814814814,
+          "shrunk": 0.3341284097152019,
+          "points": 6,
+          "kept": true
+        },
+        {
+          "key": "facebook",
+          "label": "Facebook",
+          "n": 881,
+          "rate": 0.23723041997729852,
+          "shrunk": 0.24782802099685344,
+          "points": 3,
+          "kept": true
+        },
+        {
+          "key": "tiktok",
+          "label": "Tiktok",
+          "n": 116,
+          "rate": 0.06896551724137931,
+          "shrunk": 0.17908365992813582,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q1_worked_with_an_assistant",
+      "label": "Have you ever worked with an executive assistant?",
+      "coverage": 7541,
+      "weight": 0.23003934321622624,
+      "cap": 3,
+      "defaultPoints": 1,
+      "options": [
+        {
+          "key": "yes_i_have_one_now",
+          "label": "Yes, I have one now",
+          "n": 1199,
+          "rate": 0.5145954962468724,
+          "shrunk": 0.511391423176998,
+          "points": 3,
+          "kept": true
+        },
+        {
+          "key": "yes_but_not_currently",
+          "label": "Yes, but not currently",
+          "n": 2109,
+          "rate": 0.4822190611664296,
+          "shrunk": 0.48111527908664686,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "no_never",
+          "label": "No, never",
+          "n": 4233,
+          "rate": 0.3881407984880699,
+          "shrunk": 0.3886826727873151,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q2_current_workload",
+      "label": "Which best describes your current workload?",
+      "coverage": 7541,
+      "weight": 0.3258922927125391,
+      "cap": 5,
+      "defaultPoints": 4,
+      "options": [
+        {
+          "key": "busy_but_under_control",
+          "label": "Busy but under control",
+          "n": 1380,
+          "rate": 0.4601449275362319,
+          "shrunk": 0.4592502710126367,
+          "points": 5,
+          "kept": true
+        },
+        {
+          "key": "overloaded",
+          "label": "Overloaded",
+          "n": 4021,
+          "rate": 0.4461576722208406,
+          "shrunk": 0.4460152020506192,
+          "points": 4,
+          "kept": true
+        },
+        {
+          "key": "constantly_firefighting",
+          "label": "Constantly firefighting",
+          "n": 888,
+          "rate": 0.4403153153153153,
+          "shrunk": 0.440008408899862,
+          "points": 4,
+          "kept": true
+        },
+        {
+          "key": "manageable",
+          "label": "Manageable",
+          "n": 1005,
+          "rate": 0.34228855721393037,
+          "shrunk": 0.346661504784901,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q4_how_often_do_lowvalue_tasks_interrupt_your_day",
+      "label": "How often do low-value tasks interrupt your day?",
+      "coverage": 7541,
+      "weight": 0.5306993164201163,
+      "cap": 8,
+      "defaultPoints": 8,
+      "options": [
+        {
+          "key": "constantly",
+          "label": "Constantly",
+          "n": 4323,
+          "rate": 0.44182280823502196,
+          "shrunk": 0.44173974103546093,
+          "points": 8,
+          "kept": true
+        },
+        {
+          "key": "a_few_times_a_day",
+          "label": "A few times a day",
+          "n": 2984,
+          "rate": 0.44168900804289546,
+          "shrunk": 0.4415714856783357,
+          "points": 8,
+          "kept": true
+        },
+        {
+          "key": "rarely",
+          "label": "Rarely",
+          "n": 234,
+          "rate": 0.2094017094017094,
+          "shrunk": 0.2490418575636287,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q5_day_to_day_tasks",
+      "label": "Which of these work tasks eat up the most time in your week?",
+      "coverage": 6699,
+      "weight": 0.13397372393959692,
+      "cap": 2,
+      "defaultPoints": 1,
+      "options": [
+        {
+          "key": "travel_planning_booking",
+          "label": "Travel planning & booking",
+          "n": 2763,
+          "rate": 0.49294245385450597,
+          "shrunk": 0.49190468807254556,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "vendor_logistics_coordination",
+          "label": "Vendor logistics & coordination",
+          "n": 2302,
+          "rate": 0.4565595134665508,
+          "shrunk": 0.4560917889234994,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "owning_followups_and_accountability",
+          "label": "Owning follow-ups and accountability",
+          "n": 4072,
+          "rate": 0.45604125736738704,
+          "shrunk": 0.4557806617050147,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "research_data_entry",
+          "label": "Research & data entry",
+          "n": 3063,
+          "rate": 0.445315050603983,
+          "shrunk": 0.4451422703334631,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "calendar__scheduling",
+          "label": "Calendar & scheduling",
+          "n": 4177,
+          "rate": 0.4450562604740244,
+          "shrunk": 0.44493207654319156,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "document_formatting_organization",
+          "label": "Document formatting & organization",
+          "n": 3464,
+          "rate": 0.43937644341801385,
+          "shrunk": 0.4393078792111755,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "expense_tracking_receipts_reimbursements",
+          "label": "Expense tracking (receipts, reimbursements)",
+          "n": 3004,
+          "rate": 0.43575233022636484,
+          "shrunk": 0.43573277260906046,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "all_of_the_above_most_popular",
+          "label": "All of the above (most popular)",
+          "n": 2790,
+          "rate": 0.43548387096774194,
+          "shrunk": 0.43546756603805303,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "email_inbox_management",
+          "label": "Email & inbox management",
+          "n": 4127,
+          "rate": 0.4308214199176157,
+          "shrunk": 0.43086614497200637,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q6_high_leverage_work_responsibilities",
+      "label": "Which higher-leverage work responsibilities would you most want support with?",
+      "coverage": 7540,
+      "weight": 0.0980132400679441,
+      "cap": 1,
+      "defaultPoints": 1,
+      "options": [
+        {
+          "key": "hiring_coordination_interview_logistics",
+          "label": "Hiring coordination & interview logistics",
+          "n": 1479,
+          "rate": 0.48884381338742394,
+          "shrunk": 0.48706859878879694,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "preparing_briefs_summaries_and_agendas",
+          "label": "Preparing briefs, summaries, and agendas",
+          "n": 3042,
+          "rate": 0.47698882314266927,
+          "shrunk": 0.47630268031955714,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "project_coordination_across_teams",
+          "label": "Project coordination across teams",
+          "n": 3018,
+          "rate": 0.4748177601060305,
+          "shrunk": 0.4741616321864637,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "event_planning_execution",
+          "label": "Event planning & execution",
+          "n": 2155,
+          "rate": 0.4645011600928074,
+          "shrunk": 0.46382217122361474,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "managing_recurring_workflows",
+          "label": "Managing recurring workflows",
+          "n": 3930,
+          "rate": 0.4638676844783715,
+          "shrunk": 0.4634994692331836,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "process_documentation_sops",
+          "label": "Process documentation & SOPs",
+          "n": 3230,
+          "rate": 0.45603715170278636,
+          "shrunk": 0.45570972181343616,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "content_coordination_social_blog_internal",
+          "label": "Content coordination (social, blog, internal)",
+          "n": 2827,
+          "rate": 0.427661832331093,
+          "shrunk": 0.42778167797986466,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "all_of_the_above",
+          "label": "All of the above (most popular)",
+          "n": 2943,
+          "rate": 0.4165817193340129,
+          "shrunk": 0.4168820205640062,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q7_personal_logistics",
+      "label": "Outside of work, where do you lose the most time?",
+      "coverage": 6700,
+      "weight": 0.04559263094955238,
+      "cap": 1,
+      "defaultPoints": 1,
+      "options": [
+        {
+          "key": "travel_logistics_for_personal_trips",
+          "label": "Travel logistics for personal trips",
+          "n": 2494,
+          "rate": 0.49518845228548514,
+          "shrunk": 0.4939968111431095,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "property_maintenance_coordination",
+          "label": "Property maintenance coordination",
+          "n": 1798,
+          "rate": 0.4582869855394883,
+          "shrunk": 0.4576449607944104,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "childcare_logistics_scheduling",
+          "label": "Childcare logistics & scheduling",
+          "n": 850,
+          "rate": 0.4588235294117647,
+          "shrunk": 0.4574754306089673,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "document_management_insurance_records_files",
+          "label": "Document management (insurance, records, files)",
+          "n": 3354,
+          "rate": 0.4552772808586762,
+          "shrunk": 0.45497293993774107,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "home_service_scheduling_repairs_cleaning_utilities",
+          "label": "Home service scheduling (repairs, cleaning, utilities)",
+          "n": 2595,
+          "rate": 0.45472061657032753,
+          "shrunk": 0.4543394659917091,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "bill_payment_personal_expense_coordination",
+          "label": "Bill payment & personal expense coordination",
+          "n": 2840,
+          "rate": 0.447887323943662,
+          "shrunk": 0.4476567084941421,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "household_inventory_supply_management",
+          "label": "Household inventory & supply management",
+          "n": 1708,
+          "rate": 0.43676814988290397,
+          "shrunk": 0.4367052830193803,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "kids_school_or_activity_coordination",
+          "label": "Kids' school or activity coordination",
+          "n": 947,
+          "rate": 0.43189017951425557,
+          "shrunk": 0.4320239594263496,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "all_of_the_above",
+          "label": "All of the above (most popular)",
+          "n": 1912,
+          "rate": 0.40690376569037656,
+          "shrunk": 0.4076085053761827,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q8_planning_or_errand_tasks",
+      "label": "Which personal planning or errand-related tasks would you most want support with?",
+      "coverage": 7536,
+      "weight": 0.172598533917283,
+      "cap": 2,
+      "defaultPoints": 1,
+      "options": [
+        {
+          "key": "gift_buying_for_family_friends",
+          "label": "Gift buying for family & friends",
+          "n": 2133,
+          "rate": 0.49507735583684953,
+          "shrunk": 0.4936911990600415,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "planning_upcoming_personal_commitments",
+          "label": "Planning upcoming personal commitments",
+          "n": 3376,
+          "rate": 0.4674170616113744,
+          "shrunk": 0.4669375036626009,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "research_for_personal_decisions_schools_services_trips",
+          "label": "Research for personal decisions (schools, services, trips)",
+          "n": 3140,
+          "rate": 0.46496815286624205,
+          "shrunk": 0.4644915007987682,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "party_or_event_planning_birthdays_celebrations",
+          "label": "Party or event planning (birthdays, celebrations)",
+          "n": 1435,
+          "rate": 0.4578397212543554,
+          "shrunk": 0.4570558165306872,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "personal_shopping",
+          "label": "Personal shopping",
+          "n": 1155,
+          "rate": 0.44415584415584414,
+          "shrunk": 0.4437575830274444,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "meal_planning_coordination",
+          "label": "Meal planning & coordination",
+          "n": 2317,
+          "rate": 0.41476046611998274,
+          "shrunk": 0.4151786597161261,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "grocery_shopping_recurring_errands",
+          "label": "Grocery shopping & recurring errands",
+          "n": 2119,
+          "rate": 0.4016045304388863,
+          "shrunk": 0.40236417129924873,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "all_of_the_above",
+          "label": "All of the above (most popular)",
+          "n": 2437,
+          "rate": 0.3996717275338531,
+          "shrunk": 0.4003730951138201,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q9_role_description",
+      "label": "What best describes your role?",
+      "coverage": 7539,
+      "weight": 0.32486166281462947,
+      "cap": 5,
+      "defaultPoints": 4,
+      "options": [
+        {
+          "key": "vp_executive_csuite",
+          "label": "VP/Executive/C-Suite",
+          "n": 1337,
+          "rate": 0.47718773373223633,
+          "shrunk": 0.4756509643461215,
+          "points": 5,
+          "kept": true
+        },
+        {
+          "key": "entrepreneur_or_founder",
+          "label": "Entrepreneur / founder",
+          "n": 3859,
+          "rate": 0.44933920704845814,
+          "shrunk": 0.44915013751549515,
+          "points": 4,
+          "kept": true
+        },
+        {
+          "key": "business_owner",
+          "label": "Business owner",
+          "n": 1752,
+          "rate": 0.408675799086758,
+          "shrunk": 0.40939394425531106,
+          "points": 3,
+          "kept": true
+        },
+        {
+          "key": "other",
+          "label": "Other",
+          "n": 591,
+          "rate": 0.31810490693739424,
+          "shrunk": 0.3271885921186748,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q12_predictability",
+      "label": "How predictable are your days?",
+      "coverage": 7541,
+      "weight": 0.1580461154750476,
+      "cap": 2,
+      "defaultPoints": 1,
+      "options": [
+        {
+          "key": "it_varies_week_to_week",
+          "label": "It varies week to week",
+          "n": 1177,
+          "rate": 0.46219201359388273,
+          "shrunk": 0.46106592302206234,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "mostly_predictable",
+          "label": "Mostly predictable",
+          "n": 2060,
+          "rate": 0.43980582524271844,
+          "shrunk": 0.4396814632929244,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "somewhat_unpredictable",
+          "label": "Somewhat unpredictable",
+          "n": 3109,
+          "rate": 0.43454486973303313,
+          "shrunk": 0.4345450736144573,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "very_unpredictable",
+          "label": "Very unpredictable",
+          "n": 1195,
+          "rate": 0.398326359832636,
+          "shrunk": 0.39978143578158276,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q13_stuck_on_tasks",
+      "label": "When you are stuck doing low-value tasks, how does it cost you?",
+      "coverage": 7539,
+      "weight": 0.41871363621228036,
+      "cap": 6,
+      "defaultPoints": 4,
+      "options": [
+        {
+          "key": "deep_work_gets_fragmented",
+          "label": "Deep work gets fragmented",
+          "n": 5019,
+          "rate": 0.4640366606893804,
+          "shrunk": 0.46374588430618874,
+          "points": 6,
+          "kept": true
+        },
+        {
+          "key": "strategic_or_planning_work_gets_pushed",
+          "label": "Strategic or planning work gets pushed",
+          "n": 5352,
+          "rate": 0.4588938714499253,
+          "shrunk": 0.45866862042726225,
+          "points": 6,
+          "kept": true
+        },
+        {
+          "key": "revenue_or_growth_activities_get_delayed",
+          "label": "Revenue or growth activities get delayed",
+          "n": 4863,
+          "rate": 0.45075056549455067,
+          "shrunk": 0.45058576990597815,
+          "points": 5,
+          "kept": true
+        },
+        {
+          "key": "im_not_reaching_my_potential",
+          "label": "I'm not reaching my potential",
+          "n": 3868,
+          "rate": 0.44079627714581177,
+          "shrunk": 0.44071666348853256,
+          "points": 4,
+          "kept": true
+        },
+        {
+          "key": "i_dont_achieve_my_most_important_goals",
+          "label": "I don't achieve my most important goals",
+          "n": 3863,
+          "rate": 0.4292001035464665,
+          "shrunk": 0.42926856313520845,
+          "points": 3,
+          "kept": true
+        },
+        {
+          "key": "i_spend_less_time_with_my_spouse_and_kids",
+          "label": "I spend less time with my spouse and kids",
+          "n": 3195,
+          "rate": 0.42660406885759,
+          "shrunk": 0.42672662174054565,
+          "points": 3,
+          "kept": true
+        },
+        {
+          "key": "i_dont_have_time_to_prioritize_my_health",
+          "label": "I don't have time to prioritize my health",
+          "n": 3971,
+          "rate": 0.4182825484764543,
+          "shrunk": 0.4184849260253844,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "i_dont_feel_a_meaningful_tradeoff",
+          "label": "I don't feel a meaningful trade-off",
+          "n": 1833,
+          "rate": 0.3966175668303328,
+          "shrunk": 0.39762500666387174,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q14_what_matters_mostv2",
+      "label": "What matters most to you in an executive assistant?",
+      "coverage": 7539,
+      "weight": -0.12905178566072037,
+      "cap": 0,
+      "defaultPoints": 0,
+      "options": [
+        {
+          "key": "elite_capability_and_ability_to_handle_complexity",
+          "label": "Elite capability and ability to handle complexity",
+          "n": 4041,
+          "rate": 0.4647364513734224,
+          "shrunk": 0.46436760878711086,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "someone_who_proactively_anticipates_needs",
+          "label": "Someone who proactively anticipates needs",
+          "n": 4110,
+          "rate": 0.459367396593674,
+          "shrunk": 0.459069203737517,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "security_reliability_and_professionalism",
+          "label": "Security, reliability, and professionalism",
+          "n": 4003,
+          "rate": 0.45291031726205344,
+          "shrunk": 0.4526839100784778,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "a_longterm_partner_who_learns_and_grows_with_me",
+          "label": "A long-term partner who learns and grows with me",
+          "n": 3877,
+          "rate": 0.44673716791333506,
+          "shrunk": 0.4465820951230126,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "strong_value_for_the_investment",
+          "label": "Strong value for the investment",
+          "n": 2788,
+          "rate": 0.44583931133428983,
+          "shrunk": 0.4456405523425196,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "the_stability_of_being_backed_by_a_company",
+          "label": "The stability of being backed by a company",
+          "n": 1322,
+          "rate": 0.4379727685325265,
+          "shrunk": 0.43784831453941,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "all_of_the_above",
+          "label": "All of the above",
+          "n": 3886,
+          "rate": 0.43669583118888317,
+          "shrunk": 0.43666867061688786,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q15_concerns_on_hiring",
+      "label": "Do you have any concerns about hiring an EA?",
+      "coverage": 7538,
+      "weight": 0.44702024976053856,
+      "cap": 6,
+      "defaultPoints": 4,
+      "options": [
+        {
+          "key": "finding_highquality_talent",
+          "label": "Finding high-quality talent",
+          "n": 4775,
+          "rate": 0.4774869109947644,
+          "shrunk": 0.4770420492327607,
+          "points": 6,
+          "kept": true
+        },
+        {
+          "key": "privacy_and_data_security",
+          "label": "Privacy and data security",
+          "n": 4078,
+          "rate": 0.45757724374693476,
+          "shrunk": 0.45729842237114116,
+          "points": 5,
+          "kept": true
+        },
+        {
+          "key": "poor_experiences_with_prior_eas",
+          "label": "Poor experiences with prior EAs",
+          "n": 1390,
+          "rate": 0.4568345323741007,
+          "shrunk": 0.4560610330194934,
+          "points": 5,
+          "kept": true
+        },
+        {
+          "key": "fear_of_trusting_an_ea_with_important_tasks",
+          "label": "Fear of trusting an EA with important tasks",
+          "n": 3806,
+          "rate": 0.45428271150814503,
+          "shrunk": 0.4540269417915121,
+          "points": 4,
+          "kept": true
+        },
+        {
+          "key": "not_sure_what_to_delegate",
+          "label": "Not sure what to delegate",
+          "n": 2930,
+          "rate": 0.44129692832764505,
+          "shrunk": 0.44118385488190287,
+          "points": 3,
+          "kept": true
+        },
+        {
+          "key": "cost_and_budget_fit",
+          "label": "Cost and budget fit",
+          "n": 4718,
+          "rate": 0.3961424332344214,
+          "shrunk": 0.39654527842870607,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "other",
+          "label": "Other",
+          "n": 361,
+          "rate": 0.3850415512465374,
+          "shrunk": 0.39106541982498916,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q16_what_do_you_want",
+      "label": "What do you want more of right now?",
+      "coverage": 7541,
+      "weight": 0.2388102436741374,
+      "cap": 3,
+      "defaultPoints": 2,
+      "options": [
+        {
+          "key": "time",
+          "label": "Time",
+          "n": 2247,
+          "rate": 0.4650645304850912,
+          "shrunk": 0.46440047346454966,
+          "points": 3,
+          "kept": true
+        },
+        {
+          "key": "focus",
+          "label": "Focus",
+          "n": 1274,
+          "rate": 0.4552590266875981,
+          "shrunk": 0.4544772564562466,
+          "points": 3,
+          "kept": true
+        },
+        {
+          "key": "all_four",
+          "label": "All four",
+          "n": 3499,
+          "rate": 0.42555015718776795,
+          "shrunk": 0.42567706045310527,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "freedom",
+          "label": "Freedom",
+          "n": 220,
+          "rate": 0.31363636363636366,
+          "shrunk": 0.33602921314100204,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "calm",
+          "label": "Calm",
+          "n": 301,
+          "rate": 0.3122923588039867,
+          "shrunk": 0.3297090813335343,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q17_timeline",
+      "label": "What is your timeline for getting help?",
+      "coverage": 7539,
+      "weight": 0.4235457756889096,
+      "cap": 6,
+      "defaultPoints": 5,
+      "options": [
+        {
+          "key": "asap_this_is_a_priority",
+          "label": "ASAP - this is a priority",
+          "n": 3361,
+          "rate": 0.4653376971139542,
+          "shrunk": 0.46488651056818253,
+          "points": 6,
+          "kept": true
+        },
+        {
+          "key": "within_the_next_month",
+          "label": "Within the next month",
+          "n": 2638,
+          "rate": 0.4461713419257013,
+          "shrunk": 0.445955315308062,
+          "points": 5,
+          "kept": true
+        },
+        {
+          "key": "in_the_next_23_months",
+          "label": "In the next 2-3 months",
+          "n": 728,
+          "rate": 0.37774725274725274,
+          "shrunk": 0.3813983130437925,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "just_exploring_for_now",
+          "label": "Just exploring for now",
+          "n": 812,
+          "rate": 0.32142857142857145,
+          "shrunk": 0.3279905888028661,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q3_v2_timeback",
+      "label": "What have you tried so far to get your time back?",
+      "coverage": 324,
+      "weight": 0.13841650868773156,
+      "cap": 2,
+      "defaultPoints": 1,
+      "options": [
+        {
+          "key": "a_mix_of_the_above",
+          "label": "A mix of the above",
+          "n": 97,
+          "rate": 0.4742268041237113,
+          "shrunk": 0.46073392889843917,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "productivity_systems__time_blocking",
+          "label": "Productivity systems / time blocking",
+          "n": 17,
+          "rate": 0.35294117647058826,
+          "shrunk": 0.41384906788165,
+          "points": 1,
+          "kept": false
+        },
+        {
+          "key": "havent_tried_anything_systematically",
+          "label": "Haven't tried anything systematically",
+          "n": 25,
+          "rate": 0.36,
+          "shrunk": 0.4097051673076073,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "ai_tools_and_automation",
+          "label": "AI tools and automation",
+          "n": 119,
+          "rate": 0.3949579831932773,
+          "shrunk": 0.4066738908169855,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "freelancers_or_taskbytask_vas",
+          "label": "Freelancers or task-by-task VAs",
+          "n": 10,
+          "rate": 0.2,
+          "shrunk": 0.39546479246784244,
+          "points": 1,
+          "kept": false
+        },
+        {
+          "key": "just_pushing_through",
+          "label": "Just pushing through",
+          "n": 56,
+          "rate": 0.35714285714285715,
+          "shrunk": 0.3936593164912316,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q7_v2_biggestwin",
+      "label": "If you had a trusted EA starting next Monday, what would be the biggest win?",
+      "coverage": 324,
+      "weight": 0.09852526344216941,
+      "cap": 1,
+      "defaultPoints": 0,
+      "options": [
+        {
+          "key": "a_proactive_partner_who_anticipates_needs_before_i_ask",
+          "label": "A proactive partner who anticipates needs before I ask",
+          "n": 93,
+          "rate": 0.46236559139784944,
+          "shrunk": 0.4526425702662277,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "never_missing_a_detail_followup_or_deadline_again",
+          "label": "Never missing a detail, follow-up, or deadline again",
+          "n": 90,
+          "rate": 0.4111111111111111,
+          "shrunk": 0.4194849110576468,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "real_time_back_for_family_health_or_personal_priorities",
+          "label": "Real time back for family, health, or personal priorities",
+          "n": 47,
+          "rate": 0.3404255319148936,
+          "shrunk": 0.38894729431000563,
+          "points": 0,
+          "kept": true
+        },
+        {
+          "key": "p_10_hours_a_week_back_for_highleverage_work",
+          "label": "10+ hours a week back for high-leverage work",
+          "n": 94,
+          "rate": 0.3617021276595745,
+          "shrunk": 0.38699921908382323,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    },
+    {
+      "field": "hbform_q18_v2_90days",
+      "label": "If nothing changes in the next 90 days, what's most likely to happen?",
+      "coverage": 324,
+      "weight": 0.13889453966930915,
+      "cap": 2,
+      "defaultPoints": 1,
+      "options": [
+        {
+          "key": "ill_keep_managing_but_important_things_will_slip",
+          "label": "I'll keep managing, but important things will slip",
+          "n": 130,
+          "rate": 0.45384615384615384,
+          "shrunk": 0.4484882641559475,
+          "points": 2,
+          "kept": true
+        },
+        {
+          "key": "ill_miss_opportunities_i_cant_get_back",
+          "label": "I'll miss opportunities I can't get back",
+          "n": 63,
+          "rate": 0.4126984126984127,
+          "shrunk": 0.422370686266111,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "honestly__ill_be_saying_this_same_thing_in_90_days",
+          "label": "Honestly - I'll be saying this same thing in 90 days",
+          "n": 66,
+          "rate": 0.3787878787878788,
+          "shrunk": 0.4028266167937116,
+          "points": 1,
+          "kept": true
+        },
+        {
+          "key": "ill_be_closer_to_burnout",
+          "label": "I'll be closer to burnout",
+          "n": 65,
+          "rate": 0.3076923076923077,
+          "shrunk": 0.3628511960701787,
+          "points": 0,
+          "kept": true
+        }
+      ]
+    }
+  ],
+  "unscored": [
+    {
+      "field": "hbform_q14_what_matters_mostv2",
+      "label": "What matters most to you in an executive assistant?"
+    }
+  ],
+  "tiers": [
+    {
+      "name": "tier_1",
+      "minScore": 70
+    },
+    {
+      "name": "tier_2",
+      "minScore": 55
+    },
+    {
+      "name": "tier_3",
+      "minScore": 0
+    }
+  ],
+  "forceTierRules": [
+    {
+      "id": "blocked_email_domain",
+      "type": "email_domain",
+      "field": "email",
+      "tier": "tier_3",
+      "domains": [
+        "redwirespace.com",
+        "maxspace.com",
+        "mytimein.io",
+        "thedanielramsey.com",
+        "ascendbuild.co",
+        "bruntwork.co",
+        "getmagic.com",
+        "wingassistant.com",
+        "myoutdesk.com",
+        "pearltalent.com"
+      ]
+    }
+  ],
+  "routing": {
+    "skipCalendarTiers": [
+      "tier_3"
+    ]
+  }
+}

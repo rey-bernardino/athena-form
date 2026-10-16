@@ -1,5 +1,7 @@
 // src/config/form.config.js
 
+import { SCORING_RUBRIC } from "./scoring.config.js";
+
 export const FORM_CONFIG = {
   hubspot: {
     region: "na1",
@@ -154,6 +156,8 @@ export const FORM_CONFIG = {
     exposeLegacyGlobal: true,
   },
 
+  // The rubric itself (questions, points, tiers) is generated into
+  // scoring.config.js from scoring/rubrics/. Only the switches live here.
   scoring: {
     enabled: false,
 
@@ -162,134 +166,13 @@ export const FORM_CONFIG = {
       tier: "leadscoring_tier",
     },
 
-    tiers: [
-      {
-        name: "tier_1",
-        minScore: 13,
-      },
-      {
-        name: "tier_2",
-        minScore: 5,
-      },
-      {
-        name: "tier_3",
-        minScore: 0,
-      },
-    ],
+    // Tiers routed to the "we'll be in touch" message instead of the
+    // ChiliPiper calendar. [] records the tier without changing routing.
+    routing: {
+      skipCalendarTiers: ["tier_3"],
+    },
 
-    forceTierRules: [
-      {
-        id: "blocked_email_domain",
-        type: "email_domain",
-        field: "email",
-        tier: "tier_3",
-        domains: [
-          "redwirespace.com",
-          "maxspace.com",
-          "mytimein.io",
-          "thedanielramsey.com",
-          "ascendbuild.co",
-          "bruntwork.co",
-          "getmagic.com",
-          "wingassistant.com",
-          "myoutdesk.com",
-          "pearltalent.com",
-        ],
-      },
-    ],
-
-    questions: [
-      {
-        id: "hbform_q1_worked_with_an_assistant",
-        source: "field",
-        field: "hbform_q1_worked_with_an_assistant",
-        maxPoints: 6,
-
-        options: {
-          "yes_i_have_one_now": 6,
-          "yes_but_not_currently": 6,
-        },
-      },
-
-      {
-        id: "hbform_q2_current_workload",
-        source: "field",
-        field: "hbform_q2_current_workload",
-        maxPoints: 6,
-
-        options: {
-          "overloaded": 6,
-          "constantly_firefighting": 6,
-        },
-      },
-
-      {
-        id: "hbform_q5_day_to_day_tasks",
-        source: "field",
-        field: "hbform_q5_day_to_day_tasks",
-        maxPoints: 6,
-
-        options: {
-          "calendar__scheduling": 6,
-          "email_inbox_management": 6,
-        },
-      },
-
-      {
-        id: "hbform_q7_personal_logistics",
-        source: "field",
-        field: "hbform_q7_personal_logistics",
-        maxPoints: 6,
-
-        options: {
-          "travel_logistics_for_personal_trips": 6,
-        },
-      },
-
-      {
-        id: "hbform_q17_timeline",
-        source: "field",
-        field: "hbform_q17_timeline",
-        maxPoints: 6,
-
-        options: {
-          "asap_this_is_a_priority": 6,
-        },
-      },
-
-      {
-        id: "hdyhau_primary",
-        source: "field",
-        field: "hdyhau_primary",
-        maxPoints: 25,
-
-        options: {
-          "Referral": 25,
-        },
-      },
-
-      {
-        id: "utm_medium_referral",
-        source: "utm",
-        field: "utm_medium",
-        maxPoints: 25,
-
-        options: {
-          "clientreferral": 25,
-        },
-      },
-
-      {
-        id: "utm_medium_affiliate",
-        source: "utm",
-        field: "utm_medium",
-        maxPoints: 5,
-
-        options: {
-          "affiliate": 5,
-        },
-      },
-    ],
+    ...SCORING_RUBRIC,
   },
 
   visibility: {

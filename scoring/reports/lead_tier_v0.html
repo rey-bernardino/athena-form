@@ -1,0 +1,1172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead tier report: lead_tier_v0</title>
+<style>
+.viz-root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface-1: #fcfcfb; --text-primary: #0b0b0b; --text-secondary: #52514e;
+  --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7;
+  --tier-1: #104281; --tier-2: #2a78d6; --tier-3: #86b6ef;
+  --series-1: #2a78d6; --series-2: #eb6834; --good: #006300; --critical: #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface-1: #1a1a19; --text-primary: #f0efec; --text-secondary: #c3c2b7;
+    --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+    --tier-1: #9ec5f4; --tier-2: #3987e5; --tier-3: #184f95;
+    --series-1: #3987e5; --series-2: #d95926; --good: #0ca30c; --critical: #e66767;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+.viz-root { background: var(--page); color: var(--text-primary); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; min-height: 100vh; }
+main { max-width: 1040px; margin: 0 auto; padding: 32px 24px 64px; }
+h1 { font-size: 24px; margin: 0 0 4px; }
+h2 { font-size: 18px; margin: 40px 0 8px; }
+h3 { font-size: 14px; margin: 16px 0 8px; color: var(--text-secondary); }
+p { margin: 8px 0; max-width: 760px; }
+.muted { color: var(--muted); }
+.card { background: var(--surface-1); border: 1px solid var(--grid); border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 16px 0; }
+.tile .label { color: var(--text-secondary); font-size: 13px; }
+.tile .value { font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tile .delta { font-size: 13px; color: var(--text-secondary); }
+.hero .value { font-size: 48px; }
+.pass { color: var(--good); font-weight: 600; }
+.fail { color: var(--critical); font-weight: 600; }
+table { border-collapse: collapse; width: 100%; background: var(--surface-1); font-variant-numeric: tabular-nums; }
+th, td { padding: 6px 10px; border-bottom: 1px solid var(--grid); text-align: left; vertical-align: top; }
+th { color: var(--text-secondary); font-weight: 500; font-size: 13px; }
+th.group { text-align: center; border-bottom: 1px solid var(--axis); }
+.n { text-align: right; }
+.strong { font-weight: 600; }
+tr.chosen td { background: color-mix(in srgb, var(--tier-2) 12%, transparent); }
+tr.faded td { color: var(--muted); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; }
+.swatch.tier_1 { background: var(--tier-1); } .swatch.tier_2 { background: var(--tier-2); } .swatch.tier_3 { background: var(--tier-3); }
+.legend { display: flex; gap: 16px; color: var(--text-secondary); font-size: 13px; margin: 4px 0 8px; }
+.legend .key { display: inline-block; width: 16px; height: 2px; vertical-align: middle; margin-right: 6px; }
+svg { width: 100%; height: auto; display: block; background: var(--surface-1); border-radius: 8px; }
+svg text { font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+.grid { stroke: var(--grid); stroke-width: 1; }
+.axis { stroke: var(--axis); stroke-width: 1; }
+.tick { fill: var(--muted); }
+.value { fill: var(--text-secondary); }
+.ref { stroke: var(--text-secondary); stroke-width: 1; opacity: 0.6; }
+.cut { stroke: var(--tier-1); stroke-width: 1; }
+.ref-label { fill: var(--text-secondary); font-size: 12px; }
+.bar.tier_1 { fill: var(--tier-1); } .bar.tier_2 { fill: var(--tier-2); } .bar.tier_3 { fill: var(--tier-3); }
+.bar.thin { opacity: 0.35; }
+.hit:hover .bar { opacity: 0.85; }
+.line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.line.s1 { stroke: var(--series-1); } .line.s2 { stroke: var(--series-2); }
+.dot { stroke: var(--surface-1); stroke-width: 2; } .dot.s1 { fill: var(--series-1); } .dot.s2 { fill: var(--series-2); }
+.crosshair { stroke: var(--axis); stroke-width: 1; }
+#tip { position: fixed; pointer-events: none; background: var(--surface-1); color: var(--text-primary); border: 1px solid var(--axis);
+  border-radius: 6px; padding: 6px 10px; font-size: 13px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.12); display: none; max-width: 320px; }
+details { background: var(--surface-1); border: 1px solid var(--grid); border-radius: 8px; margin: 6px 0; }
+summary { cursor: pointer; padding: 10px 14px; }
+summary .muted { margin-left: 8px; font-size: 13px; }
+.cap { display: inline-block; min-width: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
+table.options { border-top: 1px solid var(--grid); }
+code { font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<main>
+  <h1>Lead tier report: lead_tier_v0</h1>
+  <p class="muted">Form Transition 1.0.3. Data extracted 2026-10-16.
+    Points derived on leads created 2026-01-22 to 2026-06-15; every result below is on leads created 2026-06-16 to 2026-09-16, which the rubric never saw, unless marked baseline.</p>
+
+  <div class="tiles">
+    <div class="card tile hero">
+      <div class="label">Tier 1 completion, test window</div>
+      <div class="value">65.3%</div>
+      <div class="delta"><span class="pass">Meets the 60% goal</span>, 33% of leads</div>
+    </div>
+    <div class="card tile">
+      <div class="label">Ranking quality (AUC), test window</div>
+      <div class="value">0.712</div>
+      <div class="delta">vs 0.608 for the current rubric (+0.104)</div>
+    </div>
+    <div class="card tile">
+      <div class="label">Top vs bottom 20% of leads</div>
+      <div class="value">50.2 pp</div>
+      <div class="delta">71.3% vs 21.1% completion</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <strong>Tiers.</strong> Tier 1 is a score of 70 or more, tier 2 is 55 to 69, tier 3 is below 55.
+    Leads from the 10 blocked email domains are always tier 3.
+    The score runs 0-100: the share of available points a lead earned on the questions they were asked.
+  </div>
+
+  <h2>How the new rubric compares</h2>
+  <p>Outcome: close call completed within 30 days of deal creation. Population: deals with a recorded close call outcome (completed or not), 4,219 leads in the test window at a 44.1% average.
+    AUC is the chance that a lead who completed the call outscores one who did not (0.5 is a coin flip).</p>
+  
+    <table>
+      <thead><tr>
+        <th>Rubric</th><th class="n">AUC test</th><th class="n">AUC baseline</th>
+        <th class="n">Bottom 20% rate</th><th class="n">Top 20% rate</th><th class="n">Spread</th>
+        <th class="n">Top 20% capture</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+              <td>New rubric (lead_tier_v0)</td>
+              <td class="n strong">0.712</td>
+              <td class="n">0.706</td>
+              <td class="n">21.1%</td>
+              <td class="n">71.3%</td>
+              <td class="n">50.2 pp</td>
+              <td class="n">32%</td>
+            </tr><tr>
+              <td>Current rubric (legacy, as it ran until Oct 9)</td>
+              <td class="n strong">0.608</td>
+              <td class="n">0.589</td>
+              <td class="n">33.6%</td>
+              <td class="n">60.3%</td>
+              <td class="n">26.7 pp</td>
+              <td class="n">27%</td>
+            </tr>
+      </tbody>
+    </table>
+
+  <h2>Tiers</h2>
+  <p>"Completion, all leads" counts every lead whose 30 days are up, including those who never booked, which is what ops experiences.</p>
+  <div class="pair">
+    
+    <div>
+      <h3>New rubric, test window</h3>
+      <table>
+        <thead><tr><th>Tier</th><th class="n">Leads</th><th class="n">Share</th>
+          <th class="n">Completion</th><th class="n">Completion, all leads</th></tr></thead>
+        <tbody><tr>
+        <td><span class="swatch tier_1"></span>Tier 1</td>
+        <td class="n">1,395</td>
+        <td class="n">33%</td>
+        <td class="n strong">65.3%</td>
+        <td class="n">55.8%</td>
+      </tr><tr>
+        <td><span class="swatch tier_2"></span>Tier 2</td>
+        <td class="n">1,930</td>
+        <td class="n">46%</td>
+        <td class="n strong">39.2%</td>
+        <td class="n">30.9%</td>
+      </tr><tr>
+        <td><span class="swatch tier_3"></span>Tier 3</td>
+        <td class="n">894</td>
+        <td class="n">21%</td>
+        <td class="n strong">21.7%</td>
+        <td class="n">15.9%</td>
+      </tr></tbody>
+      </table>
+    </div>
+    
+    <div>
+      <h3>Current rubric, test window</h3>
+      <table>
+        <thead><tr><th>Tier</th><th class="n">Leads</th><th class="n">Share</th>
+          <th class="n">Completion</th><th class="n">Completion, all leads</th></tr></thead>
+        <tbody><tr>
+        <td><span class="swatch tier_1"></span>Tier 1</td>
+        <td class="n">2,391</td>
+        <td class="n">57%</td>
+        <td class="n strong">50.9%</td>
+        <td class="n">42.1%</td>
+      </tr><tr>
+        <td><span class="swatch tier_2"></span>Tier 2</td>
+        <td class="n">1,769</td>
+        <td class="n">42%</td>
+        <td class="n strong">35.2%</td>
+        <td class="n">27.6%</td>
+      </tr><tr>
+        <td><span class="swatch tier_3"></span>Tier 3</td>
+        <td class="n">59</td>
+        <td class="n">1%</td>
+        <td class="n strong">39.0%</td>
+        <td class="n">15.1%</td>
+      </tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2>Completion by score</h2>
+  <p>Test window, by 10-point band, colored by tier. Bands under 25 leads are faded.</p>
+  <div class="legend">
+    <span><span class="swatch tier_1"></span>Tier 1</span><span><span class="swatch tier_2"></span>Tier 2</span><span><span class="swatch tier_3"></span>Tier 3</span>
+  </div>
+  <svg viewBox="0 0 720 280" role="img" aria-label="Completion rate by score band, test window">
+    <line class="grid" x1="44" x2="704" y1="240" y2="240"/>
+        <text class="tick" x="36" y="244" text-anchor="end">0%</text><line class="grid" x1="44" x2="704" y1="196.8" y2="196.8"/>
+        <text class="tick" x="36" y="200.8" text-anchor="end">20%</text><line class="grid" x1="44" x2="704" y1="153.6" y2="153.6"/>
+        <text class="tick" x="36" y="157.6" text-anchor="end">40%</text><line class="grid" x1="44" x2="704" y1="110.4" y2="110.4"/>
+        <text class="tick" x="36" y="114.4" text-anchor="end">60%</text><line class="grid" x1="44" x2="704" y1="67.19999999999999" y2="67.19999999999999"/>
+        <text class="tick" x="36" y="71.19999999999999" text-anchor="end">80%</text><line class="grid" x1="44" x2="704" y1="24" y2="24"/>
+        <text class="tick" x="36" y="28" text-anchor="end">100%</text>
+    <line class="axis" x1="44" x2="704" y1="240" y2="240"/>
+    <line class="ref" x1="44" x2="704" y1="110.4" y2="110.4"/>
+    <text class="ref-label" x="50" y="104.4">Tier 1 goal 60%</text>
+    <text class="tick" x="77" y="256" text-anchor="middle">0-9</text><g class="hit" data-tip="Score 10-19: 0.0% completion, 1 leads, Tier 3">
+          <rect x="110" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_3 thin" d="M131,240 V240 Q131,240 131,240 H155 Q155,240 155,240 V240 Z"/>
+          
+        </g><text class="tick" x="143" y="256" text-anchor="middle">10-19</text><g class="hit" data-tip="Score 20-29: 20.0% completion, 10 leads, Tier 3">
+          <rect x="176" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_3 thin" d="M197,240 V200.8 Q197,196.8 201,196.8 H217 Q221,196.8 221,200.8 V240 Z"/>
+          
+        </g><text class="tick" x="209" y="256" text-anchor="middle">20-29</text><g class="hit" data-tip="Score 30-39: 12.3% completion, 57 leads, Tier 3">
+          <rect x="242" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_3" d="M263,240 V217.47368421052633 Q263,213.47368421052633 267,213.47368421052633 H283 Q287,213.47368421052633 287,217.47368421052633 V240 Z"/>
+          <text class="value" x="275" y="207.47368421052633" text-anchor="middle">12%</text>
+        </g><text class="tick" x="275" y="256" text-anchor="middle">30-39</text><g class="hit" data-tip="Score 40-49: 18.3% completion, 378 leads, Tier 3">
+          <rect x="308" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_3" d="M329,240 V204.57142857142856 Q329,200.57142857142856 333,200.57142857142856 H349 Q353,200.57142857142856 353,204.57142857142856 V240 Z"/>
+          <text class="value" x="341" y="194.57142857142856" text-anchor="middle">18%</text>
+        </g><text class="tick" x="341" y="256" text-anchor="middle">40-49</text><g class="hit" data-tip="Score 50-59: 28.2% completion, 1,114 leads, Tier 3">
+          <rect x="374" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_3" d="M395,240 V183.11669658886893 Q395,179.11669658886893 399,179.11669658886893 H415 Q419,179.11669658886893 419,183.11669658886893 V240 Z"/>
+          <text class="value" x="407" y="173.11669658886893" text-anchor="middle">28%</text>
+        </g><text class="tick" x="407" y="256" text-anchor="middle">50-59</text><g class="hit" data-tip="Score 60-69: 44.1% completion, 1,264 leads, Tier 2">
+          <rect x="440" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_2" d="M461,240 V148.64556962025316 Q461,144.64556962025316 465,144.64556962025316 H481 Q485,144.64556962025316 485,148.64556962025316 V240 Z"/>
+          <text class="value" x="473" y="138.64556962025316" text-anchor="middle">44%</text>
+        </g><text class="tick" x="473" y="256" text-anchor="middle">60-69</text><g class="hit" data-tip="Score 70-79: 60.5% completion, 903 leads, Tier 1">
+          <rect x="506" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_1" d="M527,240 V113.39534883720931 Q527,109.39534883720931 531,109.39534883720931 H547 Q551,109.39534883720931 551,113.39534883720931 V240 Z"/>
+          <text class="value" x="539" y="103.39534883720931" text-anchor="middle">60%</text>
+        </g><text class="tick" x="539" y="256" text-anchor="middle">70-79</text><g class="hit" data-tip="Score 80-89: 73.1% completion, 428 leads, Tier 1">
+          <rect x="572" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_1" d="M593,240 V86.03738317757009 Q593,82.03738317757009 597,82.03738317757009 H613 Q617,82.03738317757009 617,86.03738317757009 V240 Z"/>
+          <text class="value" x="605" y="76.03738317757009" text-anchor="middle">73%</text>
+        </g><text class="tick" x="605" y="256" text-anchor="middle">80-89</text><g class="hit" data-tip="Score 90-100: 81.3% completion, 64 leads, Tier 1">
+          <rect x="638" y="24" width="66" height="216" fill="transparent"/>
+          <path class="bar tier_1" d="M659,240 V68.5 Q659,64.5 663,64.5 H679 Q683,64.5 683,68.5 V240 Z"/>
+          <text class="value" x="671" y="58.5" text-anchor="middle">81%</text>
+        </g><text class="tick" x="671" y="256" text-anchor="middle">90-100</text>
+    <text class="tick" x="374" y="274" text-anchor="middle">Score band</text>
+  </svg>
+
+  <h2>Choosing the tier 1 cutoff</h2>
+  <p>Completion among leads at or above each cutoff. The cutoff was chosen on the baseline as the widest tier 1 that holds 60%; the test line confirms it out of sample.
+    Lines stop where fewer than 100 leads remain. Hover for exact values.</p>
+  <div class="legend">
+    <span><span class="key" style="background: var(--series-1)"></span>Test</span>
+    <span><span class="key" style="background: var(--series-2)"></span>Baseline</span>
+  </div>
+  <svg id="sweep" viewBox="0 0 720 300" role="img" aria-label="Completion rate at or above each cutoff"
+      data-sweep='[{&quot;c&quot;:0,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:1,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:2,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:3,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:4,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:5,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:6,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:7,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:8,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:9,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:10,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.43455775096141097,&quot;bs&quot;:1},{&quot;c&quot;:11,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.4346153846153846,&quot;bs&quot;:0.9998673915926269},{&quot;c&quot;:12,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.4346153846153846,&quot;bs&quot;:0.9998673915926269},{&quot;c&quot;:13,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.4346153846153846,&quot;bs&quot;:0.9998673915926269},{&quot;c&quot;:14,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.4346153846153846,&quot;bs&quot;:0.9998673915926269},{&quot;c&quot;:15,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.4346153846153846,&quot;bs&quot;:0.9998673915926269},{&quot;c&quot;:16,&quot;t&quot;:0.4410997866793079,&quot;ts&quot;:1,&quot;b&quot;:0.4346153846153846,&quot;bs&quot;:0.9998673915926269},{&quot;c&quot;:17,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.4346153846153846,&quot;bs&quot;:0.9998673915926269},{&quot;c&quot;:18,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.4346730335588274,&quot;bs&quot;:0.999734783185254},{&quot;c&quot;:19,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.4346730335588274,&quot;bs&quot;:0.999734783185254},{&quot;c&quot;:20,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.4346730335588274,&quot;bs&quot;:0.999734783185254},{&quot;c&quot;:21,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.4346730335588274,&quot;bs&quot;:0.999734783185254},{&quot;c&quot;:22,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.4346730335588274,&quot;bs&quot;:0.999734783185254},{&quot;c&quot;:23,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.43473069779782436,&quot;bs&quot;:0.9996021747778809},{&quot;c&quot;:24,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.4349037823490378,&quot;bs&quot;:0.9992043495557619},{&quot;c&quot;:25,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.43507700477960704,&quot;bs&quot;:0.9988065243336427},{&quot;c&quot;:26,&quot;t&quot;:0.44120436225699383,&quot;ts&quot;:0.9997629770087698,&quot;b&quot;:0.43507700477960704,&quot;bs&quot;:0.9988065243336427},{&quot;c&quot;:27,&quot;t&quot;:0.44130898743182356,&quot;ts&quot;:0.9995259540175397,&quot;b&quot;:0.4350019917673616,&quot;bs&quot;:0.9986739159262698},{&quot;c&quot;:28,&quot;t&quot;:0.4416231608922639,&quot;ts&quot;:0.9988148850438493,&quot;b&quot;:0.43523316062176165,&quot;bs&quot;:0.9981434822967776},{&quot;c&quot;:29,&quot;t&quot;:0.44167260631979094,&quot;ts&quot;:0.9976297700876985,&quot;b&quot;:0.43534883720930234,&quot;bs&quot;:0.9978782654820315},{&quot;c&quot;:30,&quot;t&quot;:0.44177756653992395,&quot;ts&quot;:0.9973927470964684,&quot;b&quot;:0.4354066985645933,&quot;bs&quot;:0.9977456570746586},{&quot;c&quot;:31,&quot;t&quot;:0.4419876367094627,&quot;ts&quot;:0.996918701114008,&quot;b&quot;:0.43546457530240595,&quot;bs&quot;:0.9976130486672855},{&quot;c&quot;:32,&quot;t&quot;:0.4422756486550821,&quot;ts&quot;:0.9957335861578573,&quot;b&quot;:0.43550531914893614,&quot;bs&quot;:0.9972152234451664},{&quot;c&quot;:33,&quot;t&quot;:0.44224815432245773,&quot;ts&quot;:0.995259540175397,&quot;b&quot;:0.43573709419904205,&quot;bs&quot;:0.9966847898156743},{&quot;c&quot;:34,&quot;t&quot;:0.44256434699714015,&quot;ts&quot;:0.9945484712017065,&quot;b&quot;:0.43585307426137876,&quot;bs&quot;:0.9964195730009282},{&quot;c&quot;:35,&quot;t&quot;:0.44288099212974,&quot;ts&quot;:0.9938374022280161,&quot;b&quot;:0.43585307426137876,&quot;bs&quot;:0.9964195730009282},{&quot;c&quot;:36,&quot;t&quot;:0.44317096466093603,&quot;ts&quot;:0.9926522872718654,&quot;b&quot;:0.4366084522063725,&quot;bs&quot;:0.9946956637050789},{&quot;c&quot;:37,&quot;t&quot;:0.4437799043062201,&quot;ts&quot;:0.9907561033420241,&quot;b&quot;:0.4374833021640395,&quot;bs&quot;:0.9927065375944835},{&quot;c&quot;:38,&quot;t&quot;:0.4444710961861358,&quot;ts&quot;:0.9881488504384925,&quot;b&quot;:0.43821127326281967,&quot;bs&quot;:0.990452194669142},{&quot;c&quot;:39,&quot;t&quot;:0.44468442524598034,&quot;ts&quot;:0.9876748044560323,&quot;b&quot;:0.4390342052313883,&quot;bs&quot;:0.9885956769659197},{&quot;c&quot;:40,&quot;t&quot;:0.44615755239701277,&quot;ts&quot;:0.9838824365963499,&quot;b&quot;:0.4392698966581667,&quot;bs&quot;:0.9880652433364275},{&quot;c&quot;:41,&quot;t&quot;:0.4478334543694021,&quot;ts&quot;:0.9791419767717469,&quot;b&quot;:0.44065741613902737,&quot;bs&quot;:0.9843522079299828},{&quot;c&quot;:42,&quot;t&quot;:0.4505360623781676,&quot;ts&quot;:0.9727423560085329,&quot;b&quot;:0.44147066774804,&quot;bs&quot;:0.9810369977456571},{&quot;c&quot;:43,&quot;t&quot;:0.45238678090575274,&quot;ts&quot;:0.96823891917516,&quot;b&quot;:0.44215380442153807,&quot;bs&quot;:0.9777217875613314},{&quot;c&quot;:44,&quot;t&quot;:0.452867339404381,&quot;ts&quot;:0.9630244133680967,&quot;b&quot;:0.44287460942806683,&quot;bs&quot;:0.9761304866728551},{&quot;c&quot;:45,&quot;t&quot;:0.4534912410560079,&quot;ts&quot;:0.9606541834557952,&quot;b&quot;:0.44429254955570746,&quot;bs&quot;:0.9700304999336958},{&quot;c&quot;:46,&quot;t&quot;:0.4563541407610047,&quot;ts&quot;:0.9530694477364304,&quot;b&quot;:0.44629578628477,&quot;bs&quot;:0.9630022543429253},{&quot;c&quot;:47,&quot;t&quot;:0.46029745399546257,&quot;ts&quot;:0.9402702062100023,&quot;b&quot;:0.44751457928353233,&quot;bs&quot;:0.9550457499005437},{&quot;c&quot;:48,&quot;t&quot;:0.46385696040868457,&quot;ts&quot;:0.9279450106660346,&quot;b&quot;:0.45124525116082737,&quot;bs&quot;:0.942447951200106},{&quot;c&quot;:49,&quot;t&quot;:0.46756616502335235,&quot;ts&quot;:0.9134866082009955,&quot;b&quot;:0.45170855690482914,&quot;bs&quot;:0.9391327410157804},{&quot;c&quot;:50,&quot;t&quot;:0.47256824807845216,&quot;ts&quot;:0.8942877459113534,&quot;b&quot;:0.45694124423963134,&quot;bs&quot;:0.9208327807983027},{&quot;c&quot;:51,&quot;t&quot;:0.4733759318423855,&quot;ts&quot;:0.8902583550604408,&quot;b&quot;:0.46028275761550796,&quot;bs&quot;:0.9098262829863414},{&quot;c&quot;:52,&quot;t&quot;:0.48004373974849646,&quot;ts&quot;:0.8670301019198863,&quot;b&quot;:0.4666666666666667,&quot;bs&quot;:0.8891393714361491},{&quot;c&quot;:53,&quot;t&quot;:0.4848993288590604,&quot;ts&quot;:0.847594216639014,&quot;b&quot;:0.46700659868026395,&quot;bs&quot;:0.884232860363347},{&quot;c&quot;:54,&quot;t&quot;:0.49349146658952847,&quot;ts&quot;:0.8193884806826263,&quot;b&quot;:0.47273006606237516,&quot;bs&quot;:0.8631481235910357},{&quot;c&quot;:55,&quot;t&quot;:0.5013533834586467,&quot;ts&quot;:0.7881014458402466,&quot;b&quot;:0.4799054373522459,&quot;bs&quot;:0.8414003447818592},{&quot;c&quot;:56,&quot;t&quot;:0.5091757387247279,&quot;ts&quot;:0.7620289168049301,&quot;b&quot;:0.4888561127499181,&quot;bs&quot;:0.8091765017902135},{&quot;c&quot;:57,&quot;t&quot;:0.5118934348239772,&quot;ts&quot;:0.7473334913486608,&quot;b&quot;:0.4979487179487179,&quot;bs&quot;:0.7757591831322106},{&quot;c&quot;:58,&quot;t&quot;:0.5212696335078534,&quot;ts&quot;:0.7243422611993363,&quot;b&quot;:0.4998274672187716,&quot;bs&quot;:0.7685983291340671},{&quot;c&quot;:59,&quot;t&quot;:0.535876793839692,&quot;ts&quot;:0.6771746859445367,&quot;b&quot;:0.5063722850475678,&quot;bs&quot;:0.7387614374751359},{&quot;c&quot;:60,&quot;t&quot;:0.5524633320797292,&quot;ts&quot;:0.6302441336809671,&quot;b&quot;:0.516974726518295,&quot;bs&quot;:0.7030897758917916},{&quot;c&quot;:61,&quot;t&quot;:0.5647626709573612,&quot;ts&quot;:0.5892391561981513,&quot;b&quot;:0.5292028413575375,&quot;bs&quot;:0.6720594085665031},{&quot;c&quot;:62,&quot;t&quot;:0.575859178541492,&quot;ts&quot;:0.5655368570751362,&quot;b&quot;:0.5312624452409399,&quot;bs&quot;:0.6659594218273438},{&quot;c&quot;:63,&quot;t&quot;:0.5834057341442224,&quot;ts&quot;:0.5456269258118037,&quot;b&quot;:0.5411985018726592,&quot;bs&quot;:0.6373160058347699},{&quot;c&quot;:64,&quot;t&quot;:0.5930715935334873,&quot;ts&quot;:0.5131547760132733,&quot;b&quot;:0.553873162168093,&quot;bs&quot;:0.604296512398886},{&quot;c&quot;:65,&quot;t&quot;:0.6080402010050251,&quot;ts&quot;:0.47167575254799715,&quot;b&quot;:0.5682295311406578,&quot;bs&quot;:0.5684922424081686},{&quot;c&quot;:66,&quot;t&quot;:0.621195652173913,&quot;ts&quot;:0.4361223038634748,&quot;b&quot;:0.5765810276679841,&quot;bs&quot;:0.5367988330460152},{&quot;c&quot;:67,&quot;t&quot;:0.6285390713476784,&quot;ts&quot;:0.4185826025124437,&quot;b&quot;:0.5775136206042595,&quot;bs&quot;:0.5354727489722848},{&quot;c&quot;:68,&quot;t&quot;:0.6419294990723562,&quot;ts&quot;:0.3832661768191515,&quot;b&quot;:0.5894319682959049,&quot;bs&quot;:0.5019228219069088},{&quot;c&quot;:69,&quot;t&quot;:0.6453900709219859,&quot;ts&quot;:0.3676226593979616,&quot;b&quot;:0.5981465880370682,&quot;bs&quot;:0.47221853865535074},{&quot;c&quot;:70,&quot;t&quot;:0.6530465949820788,&quot;ts&quot;:0.3306470727660583,&quot;b&quot;:0.6088261783248273,&quot;bs&quot;:0.44171860495955445},{&quot;c&quot;:71,&quot;t&quot;:0.6604057099924868,&quot;ts&quot;:0.31547760132732877,&quot;b&quot;:0.608315757758361,&quot;bs&quot;:0.4401273040710781},{&quot;c&quot;:72,&quot;t&quot;:0.6713692946058091,&quot;ts&quot;:0.28561270443232994,&quot;b&quot;:0.6147029865441418,&quot;bs&quot;:0.4040578172656146},{&quot;c&quot;:73,&quot;t&quot;:0.6812267657992565,&quot;ts&quot;:0.2550367385636407,&quot;b&quot;:0.6271914132379248,&quot;bs&quot;:0.3706404986076117},{&quot;c&quot;:74,&quot;t&quot;:0.7025316455696202,&quot;ts&quot;:0.22469779568618156,&quot;b&quot;:0.6427450980392156,&quot;bs&quot;:0.33815143880122},{&quot;c&quot;:75,&quot;t&quot;:0.7104072398190046,&quot;ts&quot;:0.209528324247452,&quot;b&quot;:0.6542943461372465,&quot;bs&quot;:0.3072536798833046},{&quot;c&quot;:76,&quot;t&quot;:0.7115613825983313,&quot;ts&quot;:0.1988622896420953,&quot;b&quot;:0.652534965034965,&quot;bs&quot;:0.3034080360694868},{&quot;c&quot;:77,&quot;t&quot;:0.7229916897506925,&quot;ts&quot;:0.17113059966816782,&quot;b&quot;:0.6599706026457619,&quot;bs&quot;:0.270653759448349},{&quot;c&quot;:78,&quot;t&quot;:0.7456279809220986,&quot;ts&quot;:0.14908746148376392,&quot;b&quot;:0.6703848298940324,&quot;bs&quot;:0.2377668744198382},{&quot;c&quot;:79,&quot;t&quot;:0.7485928705440901,&quot;ts&quot;:0.12633325432566958,&quot;b&quot;:0.6842775302355187,&quot;bs&quot;:0.20832780798302614},{&quot;c&quot;:80,&quot;t&quot;:0.741869918699187,&quot;ts&quot;:0.11661531168523347,&quot;b&quot;:0.6959818043972706,&quot;bs&quot;:0.1749104893250232},{&quot;c&quot;:81,&quot;t&quot;:0.756152125279642,&quot;ts&quot;:0.10594927707987675,&quot;b&quot;:0.694954128440367,&quot;bs&quot;:0.1734517968439199},{&quot;c&quot;:82,&quot;t&quot;:0.773067331670823,&quot;ts&quot;:0.09504621948328988,&quot;b&quot;:0.7152073732718894,&quot;bs&quot;:0.1438801219997348},{&quot;c&quot;:83,&quot;t&quot;:0.7823343848580442,&quot;ts&quot;:0.07513628821995734,&quot;b&quot;:0.7225368063420159,&quot;bs&quot;:0.11709322371038323},{&quot;c&quot;:84,&quot;t&quot;:0.7718631178707225,&quot;ts&quot;:0.062337046693529276,&quot;b&quot;:0.7496402877697842,&quot;bs&quot;:0.09216284312425407},{&quot;c&quot;:85,&quot;t&quot;:0.7925311203319502,&quot;ts&quot;:0.05712254088646599,&quot;b&quot;:0.7452415812591509,&quot;bs&quot;:0.09057154223577775},{&quot;c&quot;:86,&quot;t&quot;:0.8,&quot;ts&quot;:0.04740459824602986,&quot;b&quot;:0.7602339181286549,&quot;bs&quot;:0.06802811298236308},{&quot;c&quot;:87,&quot;t&quot;:0.7894736842105263,&quot;ts&quot;:0.0360274946669827,&quot;b&quot;:0.7580645161290323,&quot;bs&quot;:0.049330327542766214},{&quot;c&quot;:88,&quot;t&quot;:null,&quot;ts&quot;:0.023465276131784785,&quot;b&quot;:0.7738095238095238,&quot;bs&quot;:0.03341731865800292},{&quot;c&quot;:89,&quot;t&quot;:null,&quot;ts&quot;:0.016354586394880303,&quot;b&quot;:0.8011363636363636,&quot;bs&quot;:0.02333907969765283},{&quot;c&quot;:90,&quot;t&quot;:null,&quot;ts&quot;:0.015169471438729557,&quot;b&quot;:0.8,&quot;bs&quot;:0.022543429253414668},{&quot;c&quot;:91,&quot;t&quot;:null,&quot;ts&quot;:0.009243896657975823,&quot;b&quot;:0.8571428571428571,&quot;bs&quot;:0.014852141625779074},{&quot;c&quot;:92,&quot;t&quot;:null,&quot;ts&quot;:0.004740459824602986,&quot;b&quot;:null,&quot;bs&quot;:0.007558679220262565},{&quot;c&quot;:93,&quot;t&quot;:null,&quot;ts&quot;:0.001422137947380896,&quot;b&quot;:null,&quot;bs&quot;:0.004110860628563851},{&quot;c&quot;:94,&quot;t&quot;:null,&quot;ts&quot;:0.001422137947380896,&quot;b&quot;:null,&quot;bs&quot;:0.004110860628563851},{&quot;c&quot;:95,&quot;t&quot;:null,&quot;ts&quot;:0.00023702299123014932,&quot;b&quot;:null,&quot;bs&quot;:0.0022543429253414665},{&quot;c&quot;:96,&quot;t&quot;:null,&quot;ts&quot;:0,&quot;b&quot;:null,&quot;bs&quot;:0.001193475666357247},{&quot;c&quot;:97,&quot;t&quot;:null,&quot;ts&quot;:0,&quot;b&quot;:null,&quot;bs&quot;:0.00013260840737302744},{&quot;c&quot;:98,&quot;t&quot;:null,&quot;ts&quot;:0,&quot;b&quot;:null,&quot;bs&quot;:0},{&quot;c&quot;:99,&quot;t&quot;:null,&quot;ts&quot;:0,&quot;b&quot;:null,&quot;bs&quot;:0},{&quot;c&quot;:100,&quot;t&quot;:null,&quot;ts&quot;:0,&quot;b&quot;:null,&quot;bs&quot;:0}]' data-x0="44" data-pw="592">
+    <line class="grid" x1="44" x2="636" y1="260" y2="260"/>
+        <text class="tick" x="36" y="264" text-anchor="end">30%</text><line class="grid" x1="44" x2="636" y1="226.28571428571428" y2="226.28571428571428"/>
+        <text class="tick" x="36" y="230.28571428571428" text-anchor="end">40%</text><line class="grid" x1="44" x2="636" y1="192.57142857142856" y2="192.57142857142856"/>
+        <text class="tick" x="36" y="196.57142857142856" text-anchor="end">50%</text><line class="grid" x1="44" x2="636" y1="158.85714285714286" y2="158.85714285714286"/>
+        <text class="tick" x="36" y="162.85714285714286" text-anchor="end">60%</text><line class="grid" x1="44" x2="636" y1="125.14285714285715" y2="125.14285714285715"/>
+        <text class="tick" x="36" y="129.14285714285717" text-anchor="end">70%</text><line class="grid" x1="44" x2="636" y1="91.42857142857143" y2="91.42857142857143"/>
+        <text class="tick" x="36" y="95.42857142857143" text-anchor="end">80%</text><line class="grid" x1="44" x2="636" y1="57.71428571428567" y2="57.71428571428567"/>
+        <text class="tick" x="36" y="61.71428571428567" text-anchor="end">90%</text><line class="grid" x1="44" x2="636" y1="24" y2="24"/>
+        <text class="tick" x="36" y="28" text-anchor="end">100%</text><text class="tick" x="44" y="276" text-anchor="middle">0</text><text class="tick" x="162.4" y="276" text-anchor="middle">20</text><text class="tick" x="280.8" y="276" text-anchor="middle">40</text><text class="tick" x="399.2" y="276" text-anchor="middle">60</text><text class="tick" x="517.6" y="276" text-anchor="middle">80</text><text class="tick" x="636" y="276" text-anchor="middle">100</text>
+    <line class="axis" x1="44" x2="636" y1="260" y2="260"/>
+    <line class="ref" x1="44" x2="636" y1="158.85714285714286" y2="158.85714285714286"/>
+    <text class="ref-label" x="50" y="152.85714285714286">Tier 1 goal 60%</text>
+    <line class="cut" x1="458.4" x2="458.4" y1="24" y2="260"/>
+    <text class="ref-label" x="464.4" y="36">Tier 1 cutoff 70</text>
+    <path class="line s1" d="M44.0,212.4 L49.9,212.4 L55.8,212.4 L61.8,212.4 L67.7,212.4 L73.6,212.4 L79.5,212.4 L85.4,212.4 L91.4,212.4 L97.3,212.4 L103.2,212.4 L109.1,212.4 L115.0,212.4 L121.0,212.4 L126.9,212.4 L132.8,212.4 L138.7,212.4 L144.6,212.4 L150.6,212.4 L156.5,212.4 L162.4,212.4 L168.3,212.4 L174.2,212.4 L180.2,212.4 L186.1,212.4 L192.0,212.4 L197.9,212.4 L203.8,212.4 L209.8,212.3 L215.7,212.2 L221.6,212.2 L227.5,212.1 L233.4,212.0 L239.4,212.0 L245.3,211.9 L251.2,211.8 L257.1,211.7 L263.0,211.5 L269.0,211.3 L274.9,211.2 L280.8,210.7 L286.7,210.2 L292.6,209.2 L298.6,208.6 L304.5,208.5 L310.4,208.3 L316.3,207.3 L322.2,206.0 L328.2,204.8 L334.1,203.5 L340.0,201.8 L345.9,201.5 L351.8,199.3 L357.8,197.7 L363.7,194.8 L369.6,192.1 L375.5,189.5 L381.4,188.6 L387.4,185.4 L393.3,180.5 L399.2,174.9 L405.1,170.7 L411.0,167.0 L417.0,164.5 L422.9,161.2 L428.8,156.1 L434.7,151.7 L440.6,149.2 L446.6,144.7 L452.5,143.6 L458.4,141.0 L464.3,138.5 L470.2,134.8 L476.2,131.5 L482.1,124.3 L488.0,121.6 L493.9,121.2 L499.8,117.4 L505.8,109.8 L511.7,108.8 L517.6,111.0 L523.5,106.2 L529.4,100.5 L535.4,97.4 L541.3,100.9 L547.2,93.9 L553.1,91.4 L559.0,95.0"/>
+          <circle class="dot s1" cx="559.04" cy="94.97744360902253" r="4"/>
+          <text class="value" x="559.04" y="84.97744360902253" text-anchor="middle">Test</text><path class="line s2" d="M44.0,214.6 L49.9,214.6 L55.8,214.6 L61.8,214.6 L67.7,214.6 L73.6,214.6 L79.5,214.6 L85.4,214.6 L91.4,214.6 L97.3,214.6 L103.2,214.6 L109.1,214.6 L115.0,214.6 L121.0,214.6 L126.9,214.6 L132.8,214.6 L138.7,214.6 L144.6,214.6 L150.6,214.6 L156.5,214.6 L162.4,214.6 L168.3,214.6 L174.2,214.6 L180.2,214.6 L186.1,214.5 L192.0,214.5 L197.9,214.5 L203.8,214.5 L209.8,214.4 L215.7,214.4 L221.6,214.3 L227.5,214.3 L233.4,214.3 L239.4,214.2 L245.3,214.2 L251.2,214.2 L257.1,213.9 L263.0,213.6 L269.0,213.4 L274.9,213.1 L280.8,213.0 L286.7,212.6 L292.6,212.3 L298.6,212.1 L304.5,211.8 L310.4,211.4 L316.3,210.7 L322.2,210.3 L328.2,209.0 L334.1,208.9 L340.0,207.1 L345.9,206.0 L351.8,203.8 L357.8,203.7 L363.7,201.8 L369.6,199.3 L375.5,196.3 L381.4,193.3 L387.4,192.6 L393.3,190.4 L399.2,186.8 L405.1,182.7 L411.0,182.0 L417.0,178.7 L422.9,174.4 L428.8,169.6 L434.7,166.8 L440.6,166.4 L446.6,162.4 L452.5,159.5 L458.4,155.9 L464.3,156.1 L470.2,153.9 L476.2,149.7 L482.1,144.4 L488.0,140.6 L493.9,141.1 L499.8,138.6 L505.8,135.1 L511.7,130.4 L517.6,126.5 L523.5,126.8 L529.4,120.0 L535.4,117.5 L541.3,108.4 L547.2,109.9 L553.1,104.8 L559.0,105.6 L565.0,100.3 L570.9,91.0 L576.8,91.4 L582.7,72.2"/>
+          <circle class="dot s2" cx="582.72" cy="72.16326530612243" r="4"/>
+          <text class="value" x="582.72" y="62.163265306122426" text-anchor="middle">Baseline</text>
+    <line id="crosshair" class="crosshair" x1="0" x2="0" y1="24" y2="260" visibility="hidden"/>
+    <rect id="sweep-hit" x="44" y="24" width="592" height="236" fill="transparent"/>
+    <text class="tick" x="340" y="294" text-anchor="middle">Cutoff (score at or above)</text>
+  </svg>
+  <h3>Cutoff table</h3>
+  <table>
+    <thead>
+      <tr><th></th><th colspan="3" class="group">Test window</th><th colspan="3" class="group">Baseline window</th></tr>
+      <tr><th class="n">Cutoff</th>
+        <th class="n">Share at or above</th><th class="n">Completion at or above</th><th class="n">Completion below</th>
+        <th class="n">Share at or above</th><th class="n">Completion at or above</th><th class="n">Completion below</th></tr>
+    </thead>
+    <tbody><tr>
+      <td class="n">40</td>
+      <td class="n">98%</td><td class="n strong">44.6%</td><td class="n">13.2%</td>
+      <td class="n">99%</td><td class="n">43.9%</td><td class="n">4.4%</td>
+    </tr><tr>
+      <td class="n">45</td>
+      <td class="n">96%</td><td class="n strong">45.3%</td><td class="n">13.9%</td>
+      <td class="n">97%</td><td class="n">44.4%</td><td class="n">11.9%</td>
+    </tr><tr>
+      <td class="n">50</td>
+      <td class="n">89%</td><td class="n strong">47.3%</td><td class="n">17.5%</td>
+      <td class="n">92%</td><td class="n">45.7%</td><td class="n">17.4%</td>
+    </tr><tr>
+      <td class="n">55</td>
+      <td class="n">79%</td><td class="n strong">50.1%</td><td class="n">21.7%</td>
+      <td class="n">84%</td><td class="n">48.0%</td><td class="n">19.4%</td>
+    </tr><tr>
+      <td class="n">60</td>
+      <td class="n">63%</td><td class="n strong">55.2%</td><td class="n">25.1%</td>
+      <td class="n">70%</td><td class="n">51.7%</td><td class="n">23.9%</td>
+    </tr><tr>
+      <td class="n">65</td>
+      <td class="n">47%</td><td class="n strong">60.8%</td><td class="n">29.2%</td>
+      <td class="n">57%</td><td class="n">56.8%</td><td class="n">25.8%</td>
+    </tr><tr class="chosen">
+      <td class="n">70</td>
+      <td class="n">33%</td><td class="n strong">65.3%</td><td class="n">33.6%</td>
+      <td class="n">44%</td><td class="n">60.9%</td><td class="n">29.7%</td>
+    </tr><tr>
+      <td class="n">75</td>
+      <td class="n">21%</td><td class="n strong">71.0%</td><td class="n">37.0%</td>
+      <td class="n">31%</td><td class="n">65.4%</td><td class="n">33.7%</td>
+    </tr><tr>
+      <td class="n">80</td>
+      <td class="n">12%</td><td class="n strong">74.2%</td><td class="n">40.1%</td>
+      <td class="n">17%</td><td class="n">69.6%</td><td class="n">37.9%</td>
+    </tr><tr>
+      <td class="n">85</td>
+      <td class="n">6%</td><td class="n strong">79.3%</td><td class="n">42.0%</td>
+      <td class="n">9%</td><td class="n">74.5%</td><td class="n">40.4%</td>
+    </tr><tr>
+      <td class="n">90</td>
+      <td class="n">2%</td><td class="n strong">81.3%</td><td class="n">43.5%</td>
+      <td class="n">2%</td><td class="n">80.0%</td><td class="n">42.6%</td>
+    </tr></tbody>
+  </table>
+
+  <h2>Points per question</h2>
+  <p>Expand a question to see the points per answer. A question's cap is how much it adds to the ranking given all the others.
+    Within a question the weakest answer earns 0 and the strongest earns the cap. Multi-select questions earn their best selected answer.
+    Completion rates are baseline-window figures.</p>
+  <details>
+        <summary><span class="cap">20</span> How did you hear about us? (primary)
+          <span class="muted">24% of the score, 7,541 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Referral</td>
+                  <td class="n strong">20</td>
+                  <td class="n">70.5%</td>
+                  <td class="n">594</td>
+                </tr><tr>
+                  <td>Podcast</td>
+                  <td class="n strong">16</td>
+                  <td class="n">58.6%</td>
+                  <td class="n">1,655</td>
+                </tr><tr>
+                  <td>Other</td>
+                  <td class="n strong">14</td>
+                  <td class="n">55.4%</td>
+                  <td class="n">439</td>
+                </tr><tr>
+                  <td>Partnership</td>
+                  <td class="n strong">14</td>
+                  <td class="n">60.4%</td>
+                  <td class="n">53</td>
+                </tr><tr>
+                  <td>ChatGPT</td>
+                  <td class="n strong">13</td>
+                  <td class="n">51.4%</td>
+                  <td class="n">173</td>
+                </tr><tr class="faded">
+                  <td>Events <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">10</td>
+                  <td class="n">75.0%</td>
+                  <td class="n">8</td>
+                </tr><tr>
+                  <td>Blog or Publication</td>
+                  <td class="n strong">11</td>
+                  <td class="n">50.0%</td>
+                  <td class="n">38</td>
+                </tr><tr class="faded">
+                  <td>Newsletter <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">10</td>
+                  <td class="n">40.0%</td>
+                  <td class="n">5</td>
+                </tr><tr class="faded">
+                  <td>Reddit <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">10</td>
+                  <td class="n">41.7%</td>
+                  <td class="n">12</td>
+                </tr><tr>
+                  <td>Youtube</td>
+                  <td class="n strong">9</td>
+                  <td class="n">40.4%</td>
+                  <td class="n">171</td>
+                </tr><tr class="faded">
+                  <td>Physical Mail <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">10</td>
+                  <td class="n">25.0%</td>
+                  <td class="n">8</td>
+                </tr><tr>
+                  <td>Google</td>
+                  <td class="n strong">8</td>
+                  <td class="n">38.9%</td>
+                  <td class="n">1,358</td>
+                </tr><tr class="faded">
+                  <td>KOL <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">10</td>
+                  <td class="n">21.4%</td>
+                  <td class="n">14</td>
+                </tr><tr>
+                  <td>LinkedIn</td>
+                  <td class="n strong">8</td>
+                  <td class="n">36.6%</td>
+                  <td class="n">153</td>
+                </tr><tr>
+                  <td>Twitter</td>
+                  <td class="n strong">8</td>
+                  <td class="n">35.5%</td>
+                  <td class="n">220</td>
+                </tr><tr>
+                  <td>Instagram</td>
+                  <td class="n strong">6</td>
+                  <td class="n">33.1%</td>
+                  <td class="n">1,616</td>
+                </tr><tr>
+                  <td>Bing</td>
+                  <td class="n strong">6</td>
+                  <td class="n">14.8%</td>
+                  <td class="n">27</td>
+                </tr><tr>
+                  <td>Facebook</td>
+                  <td class="n strong">3</td>
+                  <td class="n">23.7%</td>
+                  <td class="n">881</td>
+                </tr><tr>
+                  <td>Tiktok</td>
+                  <td class="n strong">0</td>
+                  <td class="n">6.9%</td>
+                  <td class="n">116</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">10</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">8</span> Traffic medium (utm_medium)
+          <span class="muted">10% of the score, 7,541 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Referral</td>
+                  <td class="n strong">8</td>
+                  <td class="n">68.8%</td>
+                  <td class="n">109</td>
+                </tr><tr>
+                  <td>Client referral</td>
+                  <td class="n strong">8</td>
+                  <td class="n">81.1%</td>
+                  <td class="n">37</td>
+                </tr><tr>
+                  <td>Paid search</td>
+                  <td class="n strong">6</td>
+                  <td class="n">51.5%</td>
+                  <td class="n">1,760</td>
+                </tr><tr>
+                  <td>No UTM (direct / untracked)</td>
+                  <td class="n strong">6</td>
+                  <td class="n">50.7%</td>
+                  <td class="n">3,061</td>
+                </tr><tr class="faded">
+                  <td>Newsletter <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">4</td>
+                  <td class="n">100.0%</td>
+                  <td class="n">4</td>
+                </tr><tr>
+                  <td>Affiliate</td>
+                  <td class="n strong">4</td>
+                  <td class="n">47.0%</td>
+                  <td class="n">66</td>
+                </tr><tr class="faded">
+                  <td>Email <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">4</td>
+                  <td class="n">66.7%</td>
+                  <td class="n">3</td>
+                </tr><tr class="faded">
+                  <td>KOL <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">4</td>
+                  <td class="n">50.0%</td>
+                  <td class="n">2</td>
+                </tr><tr>
+                  <td>Social</td>
+                  <td class="n strong">2</td>
+                  <td class="n">29.8%</td>
+                  <td class="n">131</td>
+                </tr><tr>
+                  <td>Paid social</td>
+                  <td class="n strong">0</td>
+                  <td class="n">26.8%</td>
+                  <td class="n">2,368</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">4</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">8</span> How often do low-value tasks interrupt your day?
+          <span class="muted">10% of the score, 7,541 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Constantly</td>
+                  <td class="n strong">8</td>
+                  <td class="n">44.2%</td>
+                  <td class="n">4,323</td>
+                </tr><tr>
+                  <td>A few times a day</td>
+                  <td class="n strong">8</td>
+                  <td class="n">44.2%</td>
+                  <td class="n">2,984</td>
+                </tr><tr>
+                  <td>Rarely</td>
+                  <td class="n strong">0</td>
+                  <td class="n">20.9%</td>
+                  <td class="n">234</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">8</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">6</span> When you are stuck doing low-value tasks, how does it cost you?
+          <span class="muted">7% of the score, 7,539 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Deep work gets fragmented</td>
+                  <td class="n strong">6</td>
+                  <td class="n">46.4%</td>
+                  <td class="n">5,019</td>
+                </tr><tr>
+                  <td>Strategic or planning work gets pushed</td>
+                  <td class="n strong">6</td>
+                  <td class="n">45.9%</td>
+                  <td class="n">5,352</td>
+                </tr><tr>
+                  <td>Revenue or growth activities get delayed</td>
+                  <td class="n strong">5</td>
+                  <td class="n">45.1%</td>
+                  <td class="n">4,863</td>
+                </tr><tr>
+                  <td>I'm not reaching my potential</td>
+                  <td class="n strong">4</td>
+                  <td class="n">44.1%</td>
+                  <td class="n">3,868</td>
+                </tr><tr>
+                  <td>I don't achieve my most important goals</td>
+                  <td class="n strong">3</td>
+                  <td class="n">42.9%</td>
+                  <td class="n">3,863</td>
+                </tr><tr>
+                  <td>I spend less time with my spouse and kids</td>
+                  <td class="n strong">3</td>
+                  <td class="n">42.7%</td>
+                  <td class="n">3,195</td>
+                </tr><tr>
+                  <td>I don't have time to prioritize my health</td>
+                  <td class="n strong">2</td>
+                  <td class="n">41.8%</td>
+                  <td class="n">3,971</td>
+                </tr><tr>
+                  <td>I don't feel a meaningful trade-off</td>
+                  <td class="n strong">0</td>
+                  <td class="n">39.7%</td>
+                  <td class="n">1,833</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">4</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">6</span> Do you have any concerns about hiring an EA?
+          <span class="muted">7% of the score, 7,538 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Finding high-quality talent</td>
+                  <td class="n strong">6</td>
+                  <td class="n">47.7%</td>
+                  <td class="n">4,775</td>
+                </tr><tr>
+                  <td>Privacy and data security</td>
+                  <td class="n strong">5</td>
+                  <td class="n">45.8%</td>
+                  <td class="n">4,078</td>
+                </tr><tr>
+                  <td>Poor experiences with prior EAs</td>
+                  <td class="n strong">5</td>
+                  <td class="n">45.7%</td>
+                  <td class="n">1,390</td>
+                </tr><tr>
+                  <td>Fear of trusting an EA with important tasks</td>
+                  <td class="n strong">4</td>
+                  <td class="n">45.4%</td>
+                  <td class="n">3,806</td>
+                </tr><tr>
+                  <td>Not sure what to delegate</td>
+                  <td class="n strong">3</td>
+                  <td class="n">44.1%</td>
+                  <td class="n">2,930</td>
+                </tr><tr>
+                  <td>Cost and budget fit</td>
+                  <td class="n strong">0</td>
+                  <td class="n">39.6%</td>
+                  <td class="n">4,718</td>
+                </tr><tr>
+                  <td>Other</td>
+                  <td class="n strong">0</td>
+                  <td class="n">38.5%</td>
+                  <td class="n">361</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">4</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">6</span> What is your timeline for getting help?
+          <span class="muted">7% of the score, 7,539 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>ASAP - this is a priority</td>
+                  <td class="n strong">6</td>
+                  <td class="n">46.5%</td>
+                  <td class="n">3,361</td>
+                </tr><tr>
+                  <td>Within the next month</td>
+                  <td class="n strong">5</td>
+                  <td class="n">44.6%</td>
+                  <td class="n">2,638</td>
+                </tr><tr>
+                  <td>In the next 2-3 months</td>
+                  <td class="n strong">2</td>
+                  <td class="n">37.8%</td>
+                  <td class="n">728</td>
+                </tr><tr>
+                  <td>Just exploring for now</td>
+                  <td class="n strong">0</td>
+                  <td class="n">32.1%</td>
+                  <td class="n">812</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">5</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">5</span> Which best describes your current workload?
+          <span class="muted">6% of the score, 7,541 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Busy but under control</td>
+                  <td class="n strong">5</td>
+                  <td class="n">46.0%</td>
+                  <td class="n">1,380</td>
+                </tr><tr>
+                  <td>Overloaded</td>
+                  <td class="n strong">4</td>
+                  <td class="n">44.6%</td>
+                  <td class="n">4,021</td>
+                </tr><tr>
+                  <td>Constantly firefighting</td>
+                  <td class="n strong">4</td>
+                  <td class="n">44.0%</td>
+                  <td class="n">888</td>
+                </tr><tr>
+                  <td>Manageable</td>
+                  <td class="n strong">0</td>
+                  <td class="n">34.2%</td>
+                  <td class="n">1,005</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">4</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">5</span> What best describes your role?
+          <span class="muted">6% of the score, 7,539 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>VP/Executive/C-Suite</td>
+                  <td class="n strong">5</td>
+                  <td class="n">47.7%</td>
+                  <td class="n">1,337</td>
+                </tr><tr>
+                  <td>Entrepreneur / founder</td>
+                  <td class="n strong">4</td>
+                  <td class="n">44.9%</td>
+                  <td class="n">3,859</td>
+                </tr><tr>
+                  <td>Business owner</td>
+                  <td class="n strong">3</td>
+                  <td class="n">40.9%</td>
+                  <td class="n">1,752</td>
+                </tr><tr>
+                  <td>Other</td>
+                  <td class="n strong">0</td>
+                  <td class="n">31.8%</td>
+                  <td class="n">591</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">4</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">3</span> Have you ever worked with an executive assistant?
+          <span class="muted">4% of the score, 7,541 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Yes, I have one now</td>
+                  <td class="n strong">3</td>
+                  <td class="n">51.5%</td>
+                  <td class="n">1,199</td>
+                </tr><tr>
+                  <td>Yes, but not currently</td>
+                  <td class="n strong">2</td>
+                  <td class="n">48.2%</td>
+                  <td class="n">2,109</td>
+                </tr><tr>
+                  <td>No, never</td>
+                  <td class="n strong">0</td>
+                  <td class="n">38.8%</td>
+                  <td class="n">4,233</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">1</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">3</span> What do you want more of right now?
+          <span class="muted">4% of the score, 7,541 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Time</td>
+                  <td class="n strong">3</td>
+                  <td class="n">46.5%</td>
+                  <td class="n">2,247</td>
+                </tr><tr>
+                  <td>Focus</td>
+                  <td class="n strong">3</td>
+                  <td class="n">45.5%</td>
+                  <td class="n">1,274</td>
+                </tr><tr>
+                  <td>All four</td>
+                  <td class="n strong">2</td>
+                  <td class="n">42.6%</td>
+                  <td class="n">3,499</td>
+                </tr><tr>
+                  <td>Freedom</td>
+                  <td class="n strong">0</td>
+                  <td class="n">31.4%</td>
+                  <td class="n">220</td>
+                </tr><tr>
+                  <td>Calm</td>
+                  <td class="n strong">0</td>
+                  <td class="n">31.2%</td>
+                  <td class="n">301</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">2</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">2</span> Which of these work tasks eat up the most time in your week?
+          <span class="muted">2% of the score, 6,699 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Travel planning &amp; booking</td>
+                  <td class="n strong">2</td>
+                  <td class="n">49.3%</td>
+                  <td class="n">2,763</td>
+                </tr><tr>
+                  <td>Vendor logistics &amp; coordination</td>
+                  <td class="n strong">1</td>
+                  <td class="n">45.7%</td>
+                  <td class="n">2,302</td>
+                </tr><tr>
+                  <td>Owning follow-ups and accountability</td>
+                  <td class="n strong">1</td>
+                  <td class="n">45.6%</td>
+                  <td class="n">4,072</td>
+                </tr><tr>
+                  <td>Research &amp; data entry</td>
+                  <td class="n strong">0</td>
+                  <td class="n">44.5%</td>
+                  <td class="n">3,063</td>
+                </tr><tr>
+                  <td>Calendar &amp; scheduling</td>
+                  <td class="n strong">0</td>
+                  <td class="n">44.5%</td>
+                  <td class="n">4,177</td>
+                </tr><tr>
+                  <td>Document formatting &amp; organization</td>
+                  <td class="n strong">0</td>
+                  <td class="n">43.9%</td>
+                  <td class="n">3,464</td>
+                </tr><tr>
+                  <td>Expense tracking (receipts, reimbursements)</td>
+                  <td class="n strong">0</td>
+                  <td class="n">43.6%</td>
+                  <td class="n">3,004</td>
+                </tr><tr>
+                  <td>All of the above (most popular)</td>
+                  <td class="n strong">0</td>
+                  <td class="n">43.5%</td>
+                  <td class="n">2,790</td>
+                </tr><tr>
+                  <td>Email &amp; inbox management</td>
+                  <td class="n strong">0</td>
+                  <td class="n">43.1%</td>
+                  <td class="n">4,127</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">1</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">2</span> Which personal planning or errand-related tasks would you most want support with?
+          <span class="muted">2% of the score, 7,536 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Gift buying for family &amp; friends</td>
+                  <td class="n strong">2</td>
+                  <td class="n">49.5%</td>
+                  <td class="n">2,133</td>
+                </tr><tr>
+                  <td>Planning upcoming personal commitments</td>
+                  <td class="n strong">1</td>
+                  <td class="n">46.7%</td>
+                  <td class="n">3,376</td>
+                </tr><tr>
+                  <td>Research for personal decisions (schools, services, trips)</td>
+                  <td class="n strong">1</td>
+                  <td class="n">46.5%</td>
+                  <td class="n">3,140</td>
+                </tr><tr>
+                  <td>Party or event planning (birthdays, celebrations)</td>
+                  <td class="n strong">1</td>
+                  <td class="n">45.8%</td>
+                  <td class="n">1,435</td>
+                </tr><tr>
+                  <td>Personal shopping</td>
+                  <td class="n strong">1</td>
+                  <td class="n">44.4%</td>
+                  <td class="n">1,155</td>
+                </tr><tr>
+                  <td>Meal planning &amp; coordination</td>
+                  <td class="n strong">0</td>
+                  <td class="n">41.5%</td>
+                  <td class="n">2,317</td>
+                </tr><tr>
+                  <td>Grocery shopping &amp; recurring errands</td>
+                  <td class="n strong">0</td>
+                  <td class="n">40.2%</td>
+                  <td class="n">2,119</td>
+                </tr><tr>
+                  <td>All of the above (most popular)</td>
+                  <td class="n strong">0</td>
+                  <td class="n">40.0%</td>
+                  <td class="n">2,437</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">1</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">2</span> How predictable are your days?
+          <span class="muted">2% of the score, 7,541 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>It varies week to week</td>
+                  <td class="n strong">2</td>
+                  <td class="n">46.2%</td>
+                  <td class="n">1,177</td>
+                </tr><tr>
+                  <td>Mostly predictable</td>
+                  <td class="n strong">1</td>
+                  <td class="n">44.0%</td>
+                  <td class="n">2,060</td>
+                </tr><tr>
+                  <td>Somewhat unpredictable</td>
+                  <td class="n strong">1</td>
+                  <td class="n">43.5%</td>
+                  <td class="n">3,109</td>
+                </tr><tr>
+                  <td>Very unpredictable</td>
+                  <td class="n strong">0</td>
+                  <td class="n">39.8%</td>
+                  <td class="n">1,195</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">1</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">2</span> What have you tried so far to get your time back?
+          <span class="muted">2% of the score, 324 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>A mix of the above</td>
+                  <td class="n strong">2</td>
+                  <td class="n">47.4%</td>
+                  <td class="n">97</td>
+                </tr><tr class="faded">
+                  <td>Productivity systems / time blocking <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">1</td>
+                  <td class="n">35.3%</td>
+                  <td class="n">17</td>
+                </tr><tr>
+                  <td>Haven't tried anything systematically</td>
+                  <td class="n strong">0</td>
+                  <td class="n">36.0%</td>
+                  <td class="n">25</td>
+                </tr><tr>
+                  <td>AI tools and automation</td>
+                  <td class="n strong">0</td>
+                  <td class="n">39.5%</td>
+                  <td class="n">119</td>
+                </tr><tr class="faded">
+                  <td>Freelancers or task-by-task VAs <span class="muted">(too few leads, neutral points)</span></td>
+                  <td class="n strong">1</td>
+                  <td class="n">20.0%</td>
+                  <td class="n">10</td>
+                </tr><tr>
+                  <td>Just pushing through</td>
+                  <td class="n strong">0</td>
+                  <td class="n">35.7%</td>
+                  <td class="n">56</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">1</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">2</span> If nothing changes in the next 90 days, what's most likely to happen?
+          <span class="muted">2% of the score, 324 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>I'll keep managing, but important things will slip</td>
+                  <td class="n strong">2</td>
+                  <td class="n">45.4%</td>
+                  <td class="n">130</td>
+                </tr><tr>
+                  <td>I'll miss opportunities I can't get back</td>
+                  <td class="n strong">1</td>
+                  <td class="n">41.3%</td>
+                  <td class="n">63</td>
+                </tr><tr>
+                  <td>Honestly - I'll be saying this same thing in 90 days</td>
+                  <td class="n strong">1</td>
+                  <td class="n">37.9%</td>
+                  <td class="n">66</td>
+                </tr><tr>
+                  <td>I'll be closer to burnout</td>
+                  <td class="n strong">0</td>
+                  <td class="n">30.8%</td>
+                  <td class="n">65</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">1</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">1</span> Which higher-leverage work responsibilities would you most want support with?
+          <span class="muted">1% of the score, 7,540 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Hiring coordination &amp; interview logistics</td>
+                  <td class="n strong">1</td>
+                  <td class="n">48.9%</td>
+                  <td class="n">1,479</td>
+                </tr><tr>
+                  <td>Preparing briefs, summaries, and agendas</td>
+                  <td class="n strong">1</td>
+                  <td class="n">47.7%</td>
+                  <td class="n">3,042</td>
+                </tr><tr>
+                  <td>Project coordination across teams</td>
+                  <td class="n strong">1</td>
+                  <td class="n">47.5%</td>
+                  <td class="n">3,018</td>
+                </tr><tr>
+                  <td>Event planning &amp; execution</td>
+                  <td class="n strong">1</td>
+                  <td class="n">46.5%</td>
+                  <td class="n">2,155</td>
+                </tr><tr>
+                  <td>Managing recurring workflows</td>
+                  <td class="n strong">1</td>
+                  <td class="n">46.4%</td>
+                  <td class="n">3,930</td>
+                </tr><tr>
+                  <td>Process documentation &amp; SOPs</td>
+                  <td class="n strong">1</td>
+                  <td class="n">45.6%</td>
+                  <td class="n">3,230</td>
+                </tr><tr>
+                  <td>Content coordination (social, blog, internal)</td>
+                  <td class="n strong">0</td>
+                  <td class="n">42.8%</td>
+                  <td class="n">2,827</td>
+                </tr><tr>
+                  <td>All of the above (most popular)</td>
+                  <td class="n strong">0</td>
+                  <td class="n">41.7%</td>
+                  <td class="n">2,943</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">1</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">1</span> Outside of work, where do you lose the most time?
+          <span class="muted">1% of the score, 6,700 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>Travel logistics for personal trips</td>
+                  <td class="n strong">1</td>
+                  <td class="n">49.5%</td>
+                  <td class="n">2,494</td>
+                </tr><tr>
+                  <td>Property maintenance coordination</td>
+                  <td class="n strong">1</td>
+                  <td class="n">45.8%</td>
+                  <td class="n">1,798</td>
+                </tr><tr>
+                  <td>Childcare logistics &amp; scheduling</td>
+                  <td class="n strong">1</td>
+                  <td class="n">45.9%</td>
+                  <td class="n">850</td>
+                </tr><tr>
+                  <td>Document management (insurance, records, files)</td>
+                  <td class="n strong">1</td>
+                  <td class="n">45.5%</td>
+                  <td class="n">3,354</td>
+                </tr><tr>
+                  <td>Home service scheduling (repairs, cleaning, utilities)</td>
+                  <td class="n strong">1</td>
+                  <td class="n">45.5%</td>
+                  <td class="n">2,595</td>
+                </tr><tr>
+                  <td>Bill payment &amp; personal expense coordination</td>
+                  <td class="n strong">0</td>
+                  <td class="n">44.8%</td>
+                  <td class="n">2,840</td>
+                </tr><tr>
+                  <td>Household inventory &amp; supply management</td>
+                  <td class="n strong">0</td>
+                  <td class="n">43.7%</td>
+                  <td class="n">1,708</td>
+                </tr><tr>
+                  <td>Kids' school or activity coordination</td>
+                  <td class="n strong">0</td>
+                  <td class="n">43.2%</td>
+                  <td class="n">947</td>
+                </tr><tr>
+                  <td>All of the above (most popular)</td>
+                  <td class="n strong">0</td>
+                  <td class="n">40.7%</td>
+                  <td class="n">1,912</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">1</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><details>
+        <summary><span class="cap">1</span> If you had a trusted EA starting next Monday, what would be the biggest win?
+          <span class="muted">1% of the score, 324 baseline leads</span></summary>
+        <table class="options">
+          <thead><tr><th>Answer</th><th class="n">Points</th><th class="n">Completion</th><th class="n">Baseline leads</th></tr></thead>
+          <tbody>
+            <tr>
+                  <td>A proactive partner who anticipates needs before I ask</td>
+                  <td class="n strong">1</td>
+                  <td class="n">46.2%</td>
+                  <td class="n">93</td>
+                </tr><tr>
+                  <td>Never missing a detail, follow-up, or deadline again</td>
+                  <td class="n strong">0</td>
+                  <td class="n">41.1%</td>
+                  <td class="n">90</td>
+                </tr><tr>
+                  <td>Real time back for family, health, or personal priorities</td>
+                  <td class="n strong">0</td>
+                  <td class="n">34.0%</td>
+                  <td class="n">47</td>
+                </tr><tr>
+                  <td>10+ hours a week back for high-leverage work</td>
+                  <td class="n strong">0</td>
+                  <td class="n">36.2%</td>
+                  <td class="n">94</td>
+                </tr>
+            <tr class="faded"><td>Any other answer</td><td class="n strong">0</td><td class="n">-</td><td class="n">-</td></tr>
+          </tbody>
+        </table>
+      </details><p class="muted">Not scored (its answers do not separate outcomes once the other questions are known):</p><ul class="muted"><li>What matters most to you in an executive assistant?</li></ul>
+
+  <h2>Checks and caveats</h2>
+  <div class="card">
+    <p><strong>Engine parity.</strong> The current rubric, run through the new scoring engine on historical answers, reproduces the score stored at submit time on
+      <strong>7,329 of 7,329</strong> leads and the tier on 7,329 of 7,329.
+      The engine that produced this report is the one that ships in the form.</p>
+    <p><strong>Method.</strong> exam 0.705, fitted 0.712 on the validation month (2026-05-16 to 2026-06-15); "fitted" was chosen there, without looking at the test window.</p>
+    <p><strong>Rep behavior.</strong> Tiers were visible to reps and drove calendar routing until 2026-10-09, so historical rates partly reflect treatment. Leads since then saw no tier; once they are 30 days old they are a cleaner check.</p>
+    <p><strong>Thin questions.</strong> Three newer questions were asked of only a few hundred baseline leads, so they carry small caps until more data accumulates.</p>
+  </div>
+</main>
+<div id="tip" role="tooltip"></div>
+</div>
+<script>
+const tip = document.getElementById("tip");
+function show(text, event) {
+  tip.textContent = text;
+  tip.style.display = "block";
+  tip.style.left = Math.min(event.clientX + 14, innerWidth - tip.offsetWidth - 8) + "px";
+  tip.style.top = (event.clientY + 14) + "px";
+}
+function hide() { tip.style.display = "none"; }
+document.querySelectorAll("[data-tip]").forEach((el) => {
+  el.addEventListener("mousemove", (event) => show(el.dataset.tip, event));
+  el.addEventListener("mouseleave", hide);
+});
+const sweep = document.getElementById("sweep");
+if (sweep) {
+  const data = JSON.parse(sweep.dataset.sweep);
+  const x0 = Number(sweep.dataset.x0), pw = Number(sweep.dataset.pw);
+  const cross = document.getElementById("crosshair");
+  const hit = document.getElementById("sweep-hit");
+  const fmt = (v) => v === null ? "too few leads" : (100 * v).toFixed(1) + "%";
+  hit.addEventListener("mousemove", (event) => {
+    const point = sweep.createSVGPoint();
+    point.x = event.clientX; point.y = event.clientY;
+    const local = point.matrixTransform(sweep.getScreenCTM().inverse());
+    const cutoff = Math.max(0, Math.min(100, Math.round(((local.x - x0) / pw) * 100)));
+    const d = data[cutoff];
+    const cx = x0 + (pw * cutoff) / 100;
+    cross.setAttribute("x1", cx); cross.setAttribute("x2", cx); cross.setAttribute("visibility", "visible");
+    show("Score " + cutoff + " or above: test " + fmt(d.t) + " (" + Math.round(100 * d.ts) + "% of leads), baseline " + fmt(d.b) + " (" + Math.round(100 * d.bs) + "% of leads)", event);
+  });
+  hit.addEventListener("mouseleave", () => { hide(); cross.setAttribute("visibility", "hidden"); });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+{
+  "$comment": "Derivation spec for the lead tier rubric. Questions are the ones the live Transition form asks; options are its current option values; aliases fold legacy spellings from older form versions onto them.",
+  "name": "lead_tier_v0",
+  "form": "Transition 1.0.3",
+  "windows": {
+    "baseline": [
+      "2026-01-22",
+      "2026-06-15"
+    ],
+    "validation": [
+      "2026-05-16",
+      "2026-06-15"
+    ],
+    "test": [
+      "2026-06-16",
+      "2026-09-16"
+    ]
+  },
+  "outcome": {
+    "label": "Close call completed within 30 days of deal creation",
+    "denominator": "Deals with a recorded close call outcome (completed or not)"
+  },
+  "targets": {
+    "tier1MinRate": 0.6,
+    "tier3MaxRate": 0.2,
+    "minTierDeals": 100
+  },
+  "derivation": {
+    "maxCap": 20,
+    "shrinkK": 50,
+    "reliabilityN0": 3000,
+    "minOptionN": 40,
+    "minGradeN": 20,
+    "l2": 1.0
+  },
+  "questions": [
+    {
+      "field": "utm_medium",
+      "source": "utm",
+      "label": "Traffic medium (utm_medium)",
+      "multi": false,
+      "openOptions": true,
+      "options": {
+        "athena20122740": "No UTM (direct / untracked)",
+        "paid_social": "Paid social",
+        "paid_search": "Paid search",
+        "social": "Social",
+        "affiliate": "Affiliate",
+        "clientreferral": "Client referral",
+        "referral": "Referral",
+        "event": "Event",
+        "kol": "KOL",
+        "email": "Email",
+        "newsletter": "Newsletter"
+      },
+      "aliases": {
+        "paid-social": "paid_social",
+        "paid_sea": "paid_search",
+        "cpc": "paid_search",
+        "client_referral": "clientreferral",
+        "vip-referral": "clientreferral",
+        "referral_profile": "referral",
+        "organic_social": "social"
+      }
+    },
+    {
+      "field": "hdyhau_primary",
+      "source": "field",
+      "label": "How did you hear about us? (primary)",
+      "multi": false,
+      "options": {
+        "Instagram": "Instagram",
+        "Google": "Google",
+        "Podcast": "Podcast",
+        "Facebook": "Facebook",
+        "Referral": "Referral",
+        "Other": "Other",
+        "Twitter": "Twitter",
+        "LinkedIn": "LinkedIn",
+        "Tiktok": "Tiktok",
+        "Youtube": "Youtube",
+        "ChatGPT": "ChatGPT",
+        "Bing": "Bing",
+        "Partnership": "Partnership",
+        "Blog or Publication": "Blog or Publication",
+        "Events": "Events",
+        "Reddit": "Reddit",
+        "KOL": "KOL",
+        "Physical Mail": "Physical Mail",
+        "Newsletter": "Newsletter"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q1_worked_with_an_assistant",
+      "source": "field",
+      "label": "Have you ever worked with an executive assistant?",
+      "multi": false,
+      "options": {
+        "yes_i_have_one_now": "Yes, I have one now",
+        "yes_but_not_currently": "Yes, but not currently",
+        "no_never": "No, never"
+      },
+      "aliases": {
+        "Yes_previously": "yes_but_not_currently"
+      }
+    },
+    {
+      "field": "hbform_q2_current_workload",
+      "source": "field",
+      "label": "Which best describes your current workload?",
+      "multi": false,
+      "options": {
+        "overloaded": "Overloaded",
+        "constantly_firefighting": "Constantly firefighting",
+        "busy_but_under_control": "Busy but under control",
+        "manageable": "Manageable"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q4_how_often_do_lowvalue_tasks_interrupt_your_day",
+      "source": "field",
+      "label": "How often do low-value tasks interrupt your day?",
+      "multi": false,
+      "options": {
+        "constantly": "Constantly",
+        "a_few_times_a_day": "A few times a day",
+        "rarely": "Rarely"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q5_day_to_day_tasks",
+      "source": "field",
+      "label": "Which of these work tasks eat up the most time in your week?",
+      "multi": true,
+      "options": {
+        "calendar__scheduling": "Calendar & scheduling",
+        "email_inbox_management": "Email & inbox management",
+        "travel_planning_booking": "Travel planning & booking",
+        "expense_tracking_receipts_reimbursements": "Expense tracking (receipts, reimbursements)",
+        "owning_followups_and_accountability": "Owning follow-ups and accountability",
+        "research_data_entry": "Research & data entry",
+        "document_formatting_organization": "Document formatting & organization",
+        "vendor_logistics_coordination": "Vendor logistics & coordination",
+        "all_of_the_above_most_popular": "All of the above (most popular)"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q6_high_leverage_work_responsibilities",
+      "source": "field",
+      "label": "Which higher-leverage work responsibilities would you most want support with?",
+      "multi": true,
+      "options": {
+        "managing_recurring_workflows": "Managing recurring workflows",
+        "process_documentation_sops": "Process documentation & SOPs",
+        "preparing_briefs_summaries_and_agendas": "Preparing briefs, summaries, and agendas",
+        "project_coordination_across_teams": "Project coordination across teams",
+        "content_coordination_social_blog_internal": "Content coordination (social, blog, internal)",
+        "event_planning_execution": "Event planning & execution",
+        "hiring_coordination_interview_logistics": "Hiring coordination & interview logistics",
+        "all_of_the_above": "All of the above (most popular)"
+      },
+      "aliases": {
+        "project_coordination": "project_coordination_across_teams",
+        "meeting_prep_and_summaries": "preparing_briefs_summaries_and_agendas",
+        "content_coordination": "content_coordination_social_blog_internal"
+      }
+    },
+    {
+      "field": "hbform_q7_personal_logistics",
+      "source": "field",
+      "label": "Outside of work, where do you lose the most time?",
+      "multi": true,
+      "options": {
+        "document_management_insurance_records_files": "Document management (insurance, records, files)",
+        "bill_payment_personal_expense_coordination": "Bill payment & personal expense coordination",
+        "home_service_scheduling_repairs_cleaning_utilities": "Home service scheduling (repairs, cleaning, utilities)",
+        "travel_logistics_for_personal_trips": "Travel logistics for personal trips",
+        "property_maintenance_coordination": "Property maintenance coordination",
+        "household_inventory_supply_management": "Household inventory & supply management",
+        "kids_school_or_activity_coordination": "Kids' school or activity coordination",
+        "childcare_logistics_scheduling": "Childcare logistics & scheduling",
+        "all_of_the_above": "All of the above (most popular)"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q8_planning_or_errand_tasks",
+      "source": "field",
+      "label": "Which personal planning or errand-related tasks would you most want support with?",
+      "multi": true,
+      "options": {
+        "planning_upcoming_personal_commitments": "Planning upcoming personal commitments",
+        "research_for_personal_decisions_schools_services_trips": "Research for personal decisions (schools, services, trips)",
+        "meal_planning_coordination": "Meal planning & coordination",
+        "grocery_shopping_recurring_errands": "Grocery shopping & recurring errands",
+        "gift_buying_for_family_friends": "Gift buying for family & friends",
+        "party_or_event_planning_birthdays_celebrations": "Party or event planning (birthdays, celebrations)",
+        "personal_shopping": "Personal shopping",
+        "all_of_the_above": "All of the above (most popular)"
+      },
+      "aliases": {
+        "research_for_personal_decisions": "research_for_personal_decisions_schools_services_trips",
+        "Planning_personal_commitments": "planning_upcoming_personal_commitments",
+        "grocery_shopping_errands": "grocery_shopping_recurring_errands",
+        "gift_buying": "gift_buying_for_family_friends",
+        "party_or_event_planning": "party_or_event_planning_birthdays_celebrations"
+      }
+    },
+    {
+      "field": "hbform_q9_role_description",
+      "source": "field",
+      "label": "What best describes your role?",
+      "multi": false,
+      "options": {
+        "entrepreneur_or_founder": "Entrepreneur / founder",
+        "business_owner": "Business owner",
+        "vp_executive_csuite": "VP/Executive/C-Suite",
+        "other": "Other"
+      },
+      "aliases": {
+        "founder_or_cofounder": "entrepreneur_or_founder",
+        "ceo_or_president": "vp_executive_csuite",
+        "executive_c-level_vp": "vp_executive_csuite",
+        "corporate_executive": "vp_executive_csuite",
+        "small_business_owner": "business_owner"
+      }
+    },
+    {
+      "field": "hbform_q12_predictability",
+      "source": "field",
+      "label": "How predictable are your days?",
+      "multi": false,
+      "options": {
+        "mostly_predictable": "Mostly predictable",
+        "it_varies_week_to_week": "It varies week to week",
+        "somewhat_unpredictable": "Somewhat unpredictable",
+        "very_unpredictable": "Very unpredictable"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q13_stuck_on_tasks",
+      "source": "field",
+      "label": "When you are stuck doing low-value tasks, how does it cost you?",
+      "multi": true,
+      "options": {
+        "strategic_or_planning_work_gets_pushed": "Strategic or planning work gets pushed",
+        "deep_work_gets_fragmented": "Deep work gets fragmented",
+        "revenue_or_growth_activities_get_delayed": "Revenue or growth activities get delayed",
+        "i_dont_have_time_to_prioritize_my_health": "I don't have time to prioritize my health",
+        "i_dont_achieve_my_most_important_goals": "I don't achieve my most important goals",
+        "im_not_reaching_my_potential": "I'm not reaching my potential",
+        "i_dont_feel_a_meaningful_tradeoff": "I don't feel a meaningful trade-off",
+        "i_spend_less_time_with_my_spouse_and_kids": "I spend less time with my spouse and kids"
+      },
+      "aliases": {
+        "deep_focused work": "deep_work_gets_fragmented",
+        "strategic_and_planning work": "strategic_or_planning_work_gets_pushed",
+        "revenue_and_growth_activities": "revenue_or_growth_activities_get_delayed",
+        "health_and_personal_time": "i_dont_have_time_to_prioritize_my_health",
+        "Reaching_my_goals": "i_dont_achieve_my_most_important_goals",
+        "Time_with_family": "i_spend_less_time_with_my_spouse_and_kids"
+      }
+    },
+    {
+      "field": "hbform_q14_what_matters_mostv2",
+      "source": "field",
+      "label": "What matters most to you in an executive assistant?",
+      "multi": true,
+      "options": {
+        "someone_who_proactively_anticipates_needs": "Someone who proactively anticipates needs",
+        "elite_capability_and_ability_to_handle_complexity": "Elite capability and ability to handle complexity",
+        "security_reliability_and_professionalism": "Security, reliability, and professionalism",
+        "a_longterm_partner_who_learns_and_grows_with_me": "A long-term partner who learns and grows with me",
+        "strong_value_for_the_investment": "Strong value for the investment",
+        "the_stability_of_being_backed_by_a_company": "The stability of being backed by a company",
+        "all_of_the_above": "All of the above"
+      },
+      "aliases": {
+        "proactive_anticipates_needs": "someone_who_proactively_anticipates_needs",
+        "elite_capability": "elite_capability_and_ability_to_handle_complexity",
+        "security_and_professionalism": "security_reliability_and_professionalism",
+        "a_long-term_partner": "a_longterm_partner_who_learns_and_grows_with_me",
+        "clear_value_for_the_cost": "strong_value_for_the_investment"
+      }
+    },
+    {
+      "field": "hbform_q15_concerns_on_hiring",
+      "source": "field",
+      "label": "Do you have any concerns about hiring an EA?",
+      "multi": true,
+      "options": {
+        "cost_and_budget_fit": "Cost and budget fit",
+        "finding_highquality_talent": "Finding high-quality talent",
+        "privacy_and_data_security": "Privacy and data security",
+        "fear_of_trusting_an_ea_with_important_tasks": "Fear of trusting an EA with important tasks",
+        "not_sure_what_to_delegate": "Not sure what to delegate",
+        "poor_experiences_with_prior_eas": "Poor experiences with prior EAs",
+        "other": "Other"
+      },
+      "aliases": {
+        "trusting_them_with_important_tasks": "fear_of_trusting_an_ea_with_important_tasks"
+      }
+    },
+    {
+      "field": "hbform_q16_what_do_you_want",
+      "source": "field",
+      "label": "What do you want more of right now?",
+      "multi": false,
+      "options": {
+        "time": "Time",
+        "focus": "Focus",
+        "calm": "Calm",
+        "freedom": "Freedom",
+        "all_four": "All four"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q17_timeline",
+      "source": "field",
+      "label": "What is your timeline for getting help?",
+      "multi": false,
+      "options": {
+        "asap_this_is_a_priority": "ASAP - this is a priority",
+        "within_the_next_month": "Within the next month",
+        "in_the_next_23_months": "In the next 2-3 months",
+        "just_exploring_for_now": "Just exploring for now"
+      },
+      "aliases": {
+        "ASAP": "asap_this_is_a_priority",
+        "still_exploring": "just_exploring_for_now",
+        "next_2-3_months": "in_the_next_23_months"
+      }
+    },
+    {
+      "field": "hbform_q3_v2_timeback",
+      "source": "field",
+      "label": "What have you tried so far to get your time back?",
+      "multi": false,
+      "options": {
+        "ai_tools_and_automation": "AI tools and automation",
+        "productivity_systems__time_blocking": "Productivity systems / time blocking",
+        "freelancers_or_taskbytask_vas": "Freelancers or task-by-task VAs",
+        "a_mix_of_the_above": "A mix of the above",
+        "just_pushing_through": "Just pushing through",
+        "havent_tried_anything_systematically": "Haven't tried anything systematically"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q7_v2_biggestwin",
+      "source": "field",
+      "label": "If you had a trusted EA starting next Monday, what would be the biggest win?",
+      "multi": false,
+      "options": {
+        "p_10_hours_a_week_back_for_highleverage_work": "10+ hours a week back for high-leverage work",
+        "a_proactive_partner_who_anticipates_needs_before_i_ask": "A proactive partner who anticipates needs before I ask",
+        "never_missing_a_detail_followup_or_deadline_again": "Never missing a detail, follow-up, or deadline again",
+        "real_time_back_for_family_health_or_personal_priorities": "Real time back for family, health, or personal priorities"
+      },
+      "aliases": {}
+    },
+    {
+      "field": "hbform_q18_v2_90days",
+      "source": "field",
+      "label": "If nothing changes in the next 90 days, what's most likely to happen?",
+      "multi": false,
+      "options": {
+        "ill_keep_managing_but_important_things_will_slip": "I'll keep managing, but important things will slip",
+        "ill_miss_opportunities_i_cant_get_back": "I'll miss opportunities I can't get back",
+        "ill_be_closer_to_burnout": "I'll be closer to burnout",
+        "honestly__ill_be_saying_this_same_thing_in_90_days": "Honestly - I'll be saying this same thing in 90 days"
+      },
+      "aliases": {}
+    }
+  ],
+  "forceTierRules": [
+    {
+      "id": "blocked_email_domain",
+      "type": "email_domain",
+      "field": "email",
+      "tier": "tier_3",
+      "domains": [
+        "redwirespace.com",
+        "maxspace.com",
+        "mytimein.io",
+        "thedanielramsey.com",
+        "ascendbuild.co",
+        "bruntwork.co",
+        "getmagic.com",
+        "wingassistant.com",
+        "myoutdesk.com",
+        "pearltalent.com"
+      ]
+    }
+  ],
+  "routing": {
+    "skipCalendarTiers": [
+      "tier_3"
+    ]
+  }
+}

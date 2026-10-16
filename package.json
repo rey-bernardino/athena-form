@@ -1,6 +1,12 @@
 {
+  "type": "module",
   "scripts": {
-    "build": "vite build && node scripts/create-webflow-snippet.mjs"
+    "build": "vite build && node scripts/create-webflow-snippet.mjs",
+    "scoring:extract": "~/Athena/Dev/data-sf/data-sf/.venv/bin/python scoring/extract_dataset.py",
+    "scoring:derive": "node scoring/derive.mjs",
+    "scoring:report": "node scoring/report.mjs",
+    "scoring:config": "node scoring/build-config.mjs",
+    "test": "node --test scoring/test/*.test.mjs"
   },
   "devDependencies": {
     "vite": "^8.0.16"

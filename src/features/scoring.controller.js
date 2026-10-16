@@ -1,4 +1,9 @@
 // src/features/scoring.controller.js
+//
+// DOM adapter for the lead scoring engine: reads answers off the form, hands
+// them to scoring.engine.js, and writes the result into hidden fields.
+
+import { getEmailDomain, scoreLead } from "./scoring.engine.js";
 
 export function createScoringController({
   state,
@@ -8,10 +13,6 @@ export function createScoringController({
 
   function isEnabled() {
     return scoringConfig.enabled === true;
-  }
-
-  function normalize(value) {
-    return String(value || "").trim().toLowerCase();
   }
 
   function getFieldValues(fieldName) {
@@ -73,98 +74,43 @@ export function createScoringController({
     return [];
   }
 
-  function getOptionPoints(question, value) {
-    const options = question.options || {};
-    const normalizedValue = normalize(value);
+  // A question counts as asked when its field sits in a step the lead could
+  // see. Branching and prefill both mark hidden steps with [skip].
+  function isFieldAsked(fieldName) {
+    const $fields = $(`[name="${fieldName}"]`);
 
-    const matchedKey = Object.keys(options).find((key) => {
-      return normalize(key) === normalizedValue;
+    if (!$fields.length) return false;
+
+    const $step = $fields.first().closest("[step]");
+
+    return !$step.length || !$step.is("[skip]");
+  }
+
+  function collectInputs() {
+    const answers = {};
+    const askedFields = [];
+
+    (scoringConfig.questions || []).forEach((question) => {
+      answers[question.field] = getQuestionValues(question);
+
+      if (question.source === "utm" || isFieldAsked(question.field)) {
+        askedFields.push(question.field);
+      }
     });
 
-    if (!matchedKey) return 0;
+    const emailFields = (scoringConfig.forceTierRules || [])
+      .map((rule) => rule.field)
+      .filter(Boolean);
 
-    return Number(options[matchedKey] || 0);
-  }
-
-  function getEmailDomain(email) {
-    if (!email || !String(email).includes("@")) return "";
-
-    return String(email)
-      .split("@")
-      .pop()
-      .trim()
-      .toLowerCase();
-  }
-
-  function domainMatches(emailDomain, blockedDomain) {
-    const cleanEmailDomain = String(emailDomain || "").toLowerCase();
-    const cleanBlockedDomain = String(blockedDomain || "").toLowerCase();
-
-    return (
-      cleanEmailDomain === cleanBlockedDomain ||
-      cleanEmailDomain.endsWith(`.${cleanBlockedDomain}`)
-    );
-  }
-
-  function getForcedTier() {
-    const rules = scoringConfig.forceTierRules || [];
-
-    for (const rule of rules) {
-      if (rule.type !== "email_domain") continue;
-
-      const email = $(`[name="${rule.field}"]`).val();
-      const emailDomain = getEmailDomain(email);
-
-      const isMatch = (rule.domains || []).some((domain) => {
-        return domainMatches(emailDomain, domain);
-      });
-
-      if (isMatch) {
-        return {
-          tier: rule.tier,
-          ruleId: rule.id,
-        };
-      }
-    }
-
-    return null;
-  }
-
-  function evaluateQuestion(question) {
-    const values = getQuestionValues(question);
-
-    const rawPoints = values.reduce((total, value) => {
-      return total + getOptionPoints(question, value);
-    }, 0);
-
-    const maxPoints =
-      question.maxPoints === undefined || question.maxPoints === null
-        ? rawPoints
-        : Number(question.maxPoints);
-
-    const points = Math.min(rawPoints, maxPoints);
+    const email = emailFields.length
+      ? $(`[name="${emailFields[0]}"]`).val()
+      : "";
 
     return {
-      id: question.id,
-      field: question.field,
-      source: question.source,
-      values,
-      rawPoints,
-      maxPoints,
-      points,
+      answers,
+      askedFields,
+      emailDomain: getEmailDomain(email),
     };
-  }
-
-  function getTier(score) {
-    const tiers = [...(scoringConfig.tiers || [])].sort((a, b) => {
-      return Number(b.minScore) - Number(a.minScore);
-    });
-
-    const matchedTier = tiers.find((tier) => {
-      return score >= Number(tier.minScore);
-    });
-
-    return matchedTier?.name || "";
   }
 
   function ensureHiddenField(name) {
@@ -217,24 +163,7 @@ export function createScoringController({
       };
     }
 
-    const questions = (scoringConfig.questions || []).map(evaluateQuestion);
-
-    const score = questions.reduce((total, question) => {
-      return total + question.points;
-    }, 0);
-
-    const forcedTier = getForcedTier();
-
-    const tier = forcedTier
-      ? forcedTier.tier
-      : getTier(score);
-
-    return {
-      score,
-      tier,
-      questions,
-      forcedTier,
-    };
+    return scoreLead(scoringConfig, collectInputs());
   }
 
   function calculateAndWrite() {

@@ -76,8 +76,12 @@ export function createSubmissionController({
     $('[c_element="error_body"]').text("Someone from our team will call you shortly.");
   }
 
-  function isTier3(scoringResult) {
-    return scoringResult?.tier === "tier_3";
+  // Routing is configured separately from scoring so the score can keep being
+  // recorded while tier-based routing is switched off ([] = everyone books).
+  function skipsCalendar(scoringResult) {
+    const tiers = config.scoring?.routing?.skipCalendarTiers ?? ["tier_3"];
+
+    return Boolean(scoringResult?.tier) && tiers.includes(scoringResult.tier);
   }
 
   async function submit() {
@@ -150,9 +154,9 @@ export function createSubmissionController({
       const payload = hubspot.buildSubmissionPayload();
       await hubspot.submitForm(payload);
 
-      // If tier 3, HubSpot already received the submission.
-      // Now stop the ChiliPiper flow and show the custom message.
-      if (isTier3(scoringResult)) {
+      // HubSpot already received the submission. For tiers routed away from
+      // self-booking, stop the ChiliPiper flow and show the custom message.
+      if (skipsCalendar(scoringResult)) {
         showTier3Message();
 
         state.isSubmitting = false;
