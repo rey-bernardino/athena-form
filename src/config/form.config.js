@@ -43,6 +43,7 @@ export const FORM_CONFIG = {
   ],
 
   progressSteps: [
+    "7",
     "8",
     "v3-6",
     "9",
@@ -409,9 +410,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "Transition 1.0.3",
-    formEffectivityDate: "2026-10-09",
-    formVersionContext: "Disable lead scoring + versioning alignment",
+    formVersion: "Transition 1.0.4",
+    formEffectivityDate: "2026-10-27",
+    formVersionContext: "Show progress bar on step 7",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
