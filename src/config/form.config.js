@@ -10,7 +10,7 @@ export const FORM_CONFIG = {
 
   chili: {
     tenant: "athena",
-    router: "enterprise-lp-router",
+    router: "specialized-assistant-router",
     formIds: ["athn_form"],
   },
 
@@ -424,9 +424,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "Specialist 1.0.1",
-    formEffectivityDate: "2026-10-09",
-    formVersionContext: "Stamp any lp value + versioning alignment",
+    formVersion: "Specialist 1.0.2",
+    formEffectivityDate: "2026-10-27",
+    formVersionContext: "ChiliPiper router to specialized-assistant-router",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
