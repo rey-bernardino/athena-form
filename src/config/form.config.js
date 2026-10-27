@@ -292,9 +292,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "Transition 1.0.3",
-    formEffectivityDate: "2026-10-09",
-    formVersionContext: "Disable lead scoring + versioning alignment",
+    formVersion: "new_lead_tier_0",
+    formEffectivityDate: "2026-10-28",
+    formVersionContext: "Official test branch for new lead scoring",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",
