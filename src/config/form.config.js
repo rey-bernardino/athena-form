@@ -42,6 +42,18 @@ export const FORM_CONFIG = {
     "hbform_q18_extrahelp_secondary"
   ],
 
+  // Hidden fields stamped on page load with the visitor's local date as
+  // MM/DD/YYYY. Any input missing from the Webflow markup is created on
+  // #athn_form so it still posts.
+  consentDateFields: {
+    enabled: true,
+    names: [
+      "optin_sms_dateconsented",
+      "optin_email_dateconsented",
+      "optinholder_emailandsms_dateconsented",
+    ],
+  },
+
   progressSteps: [
     "7",
     "8",
@@ -410,9 +422,9 @@ export const FORM_CONFIG = {
     outputJsonField: "leadformjson",
     outputVersionField: "leadformversion",
 
-    formVersion: "Transition 1.0.4",
-    formEffectivityDate: "2026-10-27",
-    formVersionContext: "Show progress bar on step 7",
+    formVersion: "Transition 1.0.5",
+    formEffectivityDate: "2026-11-25",
+    formVersionContext: "Stamp consent date fields on page load",
 
     formSelector: "#athn_form",
     stepSelector: "[step]",

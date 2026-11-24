@@ -97,6 +97,39 @@ export function createPrefillController({
     }
   }
 
+  function getTodayDate() {
+    const now = new Date();
+
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    return `${month}/${day}/${now.getFullYear()}`;
+  }
+
+  // MM/DD/YYYY in the visitor's own local time, stamped once on page load.
+  function applyConsentDateFields() {
+    const consentConfig = config.consentDateFields || {};
+
+    if (consentConfig.enabled === false) return;
+
+    const names = consentConfig.names || [];
+    if (!names.length) return;
+
+    const today = getTodayDate();
+
+    names.forEach((fieldName) => {
+      let $field = $(`[name="${fieldName}"]`);
+
+      if (!$field.length) {
+        $field = $("<input>", { type: "hidden", name: fieldName });
+        $("#athn_form").append($field);
+      }
+
+      $field.val(today);
+      $field.attr("value", today);
+    });
+  }
+
   function updateUTMS() {
     setDefaultUtms();
     applyUrlParams();
@@ -186,6 +219,7 @@ export function createPrefillController({
   function init() {
     updateUTMS();
     applyPrefillSteps();
+    applyConsentDateFields();
   }
 
   return {
@@ -195,5 +229,6 @@ export function createPrefillController({
     getPrefillPairs,
     applyParamsToFields,
     applyGa4Fields,
+    applyConsentDateFields,
   };
 }
